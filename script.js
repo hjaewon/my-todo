@@ -77,6 +77,14 @@ const userNicknameDisplay = document.getElementById('userNickname');
 const logoutBtn = document.getElementById('logoutBtn');
 const timeRecordList = document.getElementById('timeRecordList');
 
+// LIST 추가 관련 요소
+const addListBtn = document.getElementById('addListBtn');
+const listAddDialog = document.getElementById('listAddDialog');
+const listAddCloseBtn = document.getElementById('listAddCloseBtn');
+const listAddCancelBtn = document.getElementById('listAddCancelBtn');
+const listAddTextarea = document.getElementById('listAddTextarea');
+const listAddSubmitBtn = document.getElementById('listAddSubmitBtn');
+
 // 초기화
 function init() {
     checkLoginStatus();
@@ -531,6 +539,17 @@ function setupEventListeners() {
             addTodo();
         }
     });
+    
+    // LIST 추가 이벤트
+    addListBtn.addEventListener('click', openListAddDialog);
+    listAddCloseBtn.addEventListener('click', closeListAddDialog);
+    listAddCancelBtn.addEventListener('click', closeListAddDialog);
+    listAddSubmitBtn.addEventListener('click', submitListAdd);
+    listAddDialog.addEventListener('click', (e) => {
+        if (e.target === listAddDialog) {
+            closeListAddDialog();
+        }
+    });
 
     closeNoteBtn.addEventListener('click', closeNote);
     openNoteBtn.addEventListener('click', openNote);
@@ -901,6 +920,62 @@ function addTodo() {
     todoInput.value = '';
     renderTodoList();
     renderCalendar();
+}
+
+// LIST 추가 다이얼로그 열기
+function openListAddDialog() {
+    if (!selectedDate) {
+        alert('날짜를 먼저 선택해주세요.');
+        return;
+    }
+    listAddTextarea.value = '';
+    listAddDialog.classList.add('active');
+    listAddTextarea.focus();
+}
+
+// LIST 추가 다이얼로그 닫기
+function closeListAddDialog() {
+    listAddDialog.classList.remove('active');
+    listAddTextarea.value = '';
+}
+
+// LIST 일괄 추가
+function submitListAdd() {
+    if (!selectedDate) return;
+    
+    const text = listAddTextarea.value.trim();
+    if (!text) {
+        alert('추가할 할일을 입력해주세요.');
+        return;
+    }
+    
+    // 줄바꿈으로 분리하여 각각 할일로 추가
+    const lines = text.split('\n').map(line => line.trim()).filter(line => line);
+    
+    if (lines.length === 0) {
+        alert('추가할 할일을 입력해주세요.');
+        return;
+    }
+    
+    if (!todos[selectedDate]) {
+        todos[selectedDate] = [];
+    }
+    
+    // 각 라인을 할일로 추가
+    lines.forEach(line => {
+        todos[selectedDate].push({
+            text: line,
+            completed: false,
+            createdAt: new Date().toISOString()
+        });
+    });
+    
+    saveTodos();
+    renderTodoList();
+    renderCalendar();
+    closeListAddDialog();
+    
+    alert(`${lines.length}개의 할일이 추가되었습니다!`);
 }
 
 // 할일 토글

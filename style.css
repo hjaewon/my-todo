@@ -794,6 +794,26 @@ body::before {
     box-shadow: 0 6px 16px rgba(139, 195, 74, 0.4);
 }
 
+.add-list-btn {
+    background: #66bb6a;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(102, 187, 106, 0.3);
+    white-space: nowrap;
+}
+
+.add-list-btn:hover {
+    background: #5cb860;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(102, 187, 106, 0.4);
+}
+
 /* 할일 목록 */
 .todo-list {
     display: flex;
@@ -1040,6 +1060,90 @@ body::before {
 
 .time-input::placeholder {
     color: #aaa;
+}
+
+/* LIST 추가 다이얼로그 */
+.list-add-container {
+    max-width: 600px;
+}
+
+.list-add-guide {
+    background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+    border: 2px solid #c5e1a5;
+    border-radius: 12px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+}
+
+.list-add-guide p {
+    color: #558b2f;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.list-add-textarea {
+    width: 100%;
+    min-height: 300px;
+    padding: 15px;
+    border: 2px solid #c5e1a5;
+    border-radius: 12px;
+    font-size: 14px;
+    font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+    line-height: 1.6;
+    resize: vertical;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.list-add-textarea:focus {
+    outline: none;
+    border-color: #8bc34a;
+    background: white;
+    box-shadow: 0 4px 12px rgba(139, 195, 74, 0.2);
+}
+
+.list-add-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.list-add-submit-btn {
+    flex: 1;
+    background: linear-gradient(135deg, #8bc34a 0%, #7cb342 100%);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 16px rgba(139, 195, 74, 0.3);
+}
+
+.list-add-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(139, 195, 74, 0.4);
+    background: linear-gradient(135deg, #7cb342 0%, #689f38 100%);
+}
+
+.list-add-cancel-btn {
+    padding: 14px 30px;
+    background: #e0e0e0;
+    color: #666;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.list-add-cancel-btn:hover {
+    background: #d0d0d0;
+    transform: translateY(-2px);
 }
 
 /* 검색 팝업 */

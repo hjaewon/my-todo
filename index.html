@@ -203,6 +203,7 @@
                 <div class="todo-input-section">
                     <input type="text" id="todoInput" class="todo-input" placeholder="할일을 입력하세요">
                     <button class="add-todo-btn" id="addTodoBtn">추가</button>
+                    <button class="add-list-btn" id="addListBtn">LIST 추가</button>
                 </div>
 
                 <!-- 할일 목록 -->
@@ -223,6 +224,32 @@
 
     <!-- 미리보기 툴팁 -->
     <div class="preview-tooltip" id="previewTooltip"></div>
+
+    <!-- LIST 추가 다이얼로그 -->
+    <div class="popup-overlay" id="listAddDialog">
+        <div class="popup-container list-add-container">
+            <div class="popup-header">
+                <h2>할일 LIST 추가</h2>
+                <button class="popup-close-btn" id="listAddCloseBtn">✕</button>
+            </div>
+            
+            <div class="popup-content">
+                <div class="list-add-guide">
+                    <p>💡 한 줄에 하나씩 할일을 입력하세요</p>
+                </div>
+                
+                <textarea 
+                    id="listAddTextarea" 
+                    class="list-add-textarea" 
+                    placeholder="회의 준비&#10;보고서 작성&#10;이메일 확인&#10;프로젝트 기획&#10;..."></textarea>
+                
+                <div class="list-add-actions">
+                    <button class="list-add-submit-btn" id="listAddSubmitBtn">일괄 추가</button>
+                    <button class="list-add-cancel-btn" id="listAddCancelBtn">취소</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- 검색 팝업 -->
     <div class="popup-overlay" id="searchPopupOverlay">
