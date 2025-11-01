@@ -32,6 +32,12 @@ const yearGrid = document.getElementById('yearGrid');
 const yearRangeLabel = document.getElementById('yearRangeLabel');
 const prevYearRangeBtn = document.getElementById('prevYearRange');
 const nextYearRangeBtn = document.getElementById('nextYearRange');
+const searchBtn = document.getElementById('searchBtn');
+const searchPopupOverlay = document.getElementById('searchPopupOverlay');
+const searchPopupCloseBtn = document.getElementById('searchPopupCloseBtn');
+const searchInput = document.getElementById('searchInput');
+const searchExecuteBtn = document.getElementById('searchExecuteBtn');
+const searchResults = document.getElementById('searchResults');
 
 // 초기화
 function init() {
@@ -72,6 +78,21 @@ function setupEventListeners() {
     nextYearRangeBtn.addEventListener('click', () => {
         yearRangeStart += 12;
         renderYearPicker();
+    });
+    
+    searchBtn.addEventListener('click', openSearchPopup);
+    searchPopupCloseBtn.addEventListener('click', closeSearchPopup);
+    searchPopupOverlay.addEventListener('click', (e) => {
+        if (e.target === searchPopupOverlay) {
+            closeSearchPopup();
+        }
+    });
+    
+    searchExecuteBtn.addEventListener('click', performSearch);
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            performSearch();
+        }
     });
 
     popupCloseBtn.addEventListener('click', closePopup);
@@ -563,6 +584,115 @@ function openNote() {
     noteSection.classList.remove('hidden');
     calendarSection.classList.remove('full-width');
     openNoteBtn.style.display = 'none';
+}
+
+// 검색 팝업 열기
+function openSearchPopup() {
+    searchPopupOverlay.classList.add('active');
+    searchInput.focus();
+    searchInput.value = '';
+    searchResults.innerHTML = '<div class="no-search-message">검색어를 입력하고 검색 버튼을 눌러주세요</div>';
+}
+
+// 검색 팝업 닫기
+function closeSearchPopup() {
+    searchPopupOverlay.classList.remove('active');
+    searchInput.value = '';
+}
+
+// 검색 수행
+function performSearch() {
+    const searchTerm = searchInput.value.trim().toLowerCase();
+    
+    if (!searchTerm) {
+        searchResults.innerHTML = '<div class="no-search-message">검색어를 입력해주세요</div>';
+        return;
+    }
+    
+    // 모든 할일에서 검색어 포함된 항목 찾기
+    const searchResultsData = [];
+    
+    Object.keys(todos).forEach(dateString => {
+        const dateTodos = todos[dateString];
+        const matchedTodos = dateTodos.filter(todo => 
+            todo.text.toLowerCase().includes(searchTerm)
+        );
+        
+        if (matchedTodos.length > 0) {
+            searchResultsData.push({
+                date: dateString,
+                todos: matchedTodos
+            });
+        }
+    });
+    
+    // 날짜 내림차순 정렬
+    searchResultsData.sort((a, b) => {
+        return new Date(b.date) - new Date(a.date);
+    });
+    
+    // 결과 렌더링
+    if (searchResultsData.length === 0) {
+        searchResults.innerHTML = '<div class="no-search-message">검색 결과가 없습니다</div>';
+        return;
+    }
+    
+    let html = '';
+    
+    searchResultsData.forEach(result => {
+        const [year, month, day] = result.date.split('-');
+        const dateLabel = `${year}년 ${parseInt(month)}월 ${parseInt(day)}일`;
+        
+        html += `<div class="search-result-date-group">`;
+        html += `<div class="search-result-date">${dateLabel}</div>`;
+        
+        result.todos.forEach((todo, index) => {
+            const highlightedText = highlightSearchTerm(todo.text, searchTerm);
+            const statusClass = todo.completed ? 'completed' : 'pending';
+            const statusText = todo.completed ? '✓ 완료' : '○ 진행중';
+            
+            html += `
+                <div class="search-result-item" onclick="openDateFromSearch('${result.date}')">
+                    <div class="search-result-text">${highlightedText}</div>
+                    <div class="search-result-status ${statusClass}">${statusText}</div>
+                </div>
+            `;
+        });
+        
+        html += `</div>`;
+    });
+    
+    searchResults.innerHTML = html;
+}
+
+// 검색어 하이라이트
+function highlightSearchTerm(text, searchTerm) {
+    const regex = new RegExp(`(${escapeRegExp(searchTerm)})`, 'gi');
+    return text.replace(regex, '<span class="highlight">$1</span>');
+}
+
+// 정규식 특수문자 이스케이프
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// 검색 결과에서 날짜 클릭 시 해당 날짜로 이동
+function openDateFromSearch(dateString) {
+    closeSearchPopup();
+    
+    // 날짜 파싱
+    const [year, month, day] = dateString.split('-').map(Number);
+    
+    // 현재 날짜를 해당 날짜로 설정
+    currentDate = new Date(year, month - 1, day);
+    
+    // 달력 뷰로 전환
+    showCalendar();
+    
+    // 약간의 딜레이 후 팝업 열기 (애니메이션 효과)
+    setTimeout(() => {
+        openPopup(dateString);
+    }, 300);
 }
 
 // 앱 초기화

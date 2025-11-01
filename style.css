@@ -39,6 +39,7 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 30px;
+    gap: 15px;
 }
 
 .calendar-title {
@@ -52,6 +53,24 @@ body {
 
 .calendar-title:hover {
     color: #667eea;
+}
+
+.search-btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.search-btn:hover {
+    background: #764ba2;
+    transform: scale(1.1);
 }
 
 .nav-btn {
@@ -572,6 +591,115 @@ body {
     color: #999;
     padding: 40px;
     font-size: 16px;
+}
+
+/* 검색 팝업 */
+.search-popup-container {
+    max-width: 700px;
+}
+
+.search-input-section {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.search-input {
+    flex: 1;
+    padding: 15px 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.search-execute-btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.search-execute-btn:hover {
+    background: #764ba2;
+    transform: translateY(-2px);
+}
+
+.search-results {
+    min-height: 300px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.no-search-message {
+    text-align: center;
+    color: #999;
+    padding: 60px 20px;
+    font-size: 16px;
+}
+
+.search-result-date-group {
+    margin-bottom: 25px;
+}
+
+.search-result-date {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.search-result-item {
+    background: #f8f9ff;
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.search-result-item:hover {
+    background: #e8ebff;
+    transform: translateX(5px);
+}
+
+.search-result-text {
+    font-size: 15px;
+    color: #333;
+}
+
+.search-result-text .highlight {
+    background-color: #ffeb3b;
+    font-weight: 600;
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+.search-result-status {
+    font-size: 13px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.search-result-status.completed {
+    color: #4caf50;
+}
+
+.search-result-status.pending {
+    color: #ff9800;
 }
 
 /* 스크롤바 스타일 */
