@@ -2,6 +2,7 @@
 let currentDate = new Date();
 let selectedDate = null;
 let todos = {};
+let timeRecords = {}; // 시간별 기록 저장
 let noteContent = '';
 let viewMode = 'calendar'; // 'calendar', 'month', 'year'
 let yearRangeStart = Math.floor(currentDate.getFullYear() / 12) * 12;
@@ -74,6 +75,7 @@ const idCheckButton = document.getElementById('idCheckButton');
 const idCheckMessage = document.getElementById('idCheckMessage');
 const userNicknameDisplay = document.getElementById('userNickname');
 const logoutBtn = document.getElementById('logoutBtn');
+const timeRecordList = document.getElementById('timeRecordList');
 
 // 초기화
 function init() {
@@ -102,9 +104,11 @@ function loadUserData() {
     if (userData) {
         const parsed = JSON.parse(userData);
         todos = parsed.todos || {};
+        timeRecords = parsed.timeRecords || {};
         noteContent = parsed.noteContent || '';
     } else {
         todos = {};
+        timeRecords = {};
         noteContent = '';
     }
     
@@ -119,6 +123,7 @@ function saveUserData() {
     const userDataKey = `userData_${currentUser.id}`;
     const userData = {
         todos: todos,
+        timeRecords: timeRecords,
         noteContent: noteContent
     };
     
@@ -398,12 +403,67 @@ function handleChangePassword() {
     resetPasswordChangeForm();
 }
 
+// 시간별 기록 렌더링
+function renderTimeRecordList() {
+    if (!selectedDate) return;
+    
+    const timeSlots = [];
+    // 오전 9시부터 오후 10시까지 (9:00 ~ 22:00)
+    for (let hour = 9; hour <= 22; hour++) {
+        const startHour = String(hour).padStart(2, '0');
+        const endHour = String(hour + 1).padStart(2, '0');
+        const timeKey = `${hour}:00`;
+        const label = `${startHour}:00~${endHour}:00`;
+        timeSlots.push({ timeKey, label });
+    }
+    
+    timeRecordList.innerHTML = '';
+    
+    timeSlots.forEach(slot => {
+        const recordKey = `${selectedDate}_${slot.timeKey}`;
+        const savedRecord = timeRecords[recordKey] || '';
+        
+        const timeItem = document.createElement('div');
+        timeItem.className = 'time-record-item';
+        if (savedRecord) {
+            timeItem.classList.add('has-content');
+        }
+        
+        const timeLabel = document.createElement('div');
+        timeLabel.className = 'time-label';
+        timeLabel.textContent = slot.label;
+        
+        const timeInput = document.createElement('input');
+        timeInput.type = 'text';
+        timeInput.className = 'time-input';
+        timeInput.placeholder = '한 일을 기록하세요...';
+        timeInput.value = savedRecord;
+        
+        timeInput.addEventListener('input', () => {
+            const value = timeInput.value.trim();
+            if (value) {
+                timeRecords[recordKey] = value;
+                timeItem.classList.add('has-content');
+            } else {
+                delete timeRecords[recordKey];
+                timeItem.classList.remove('has-content');
+            }
+            saveUserData();
+        });
+        
+        timeItem.appendChild(timeLabel);
+        timeItem.appendChild(timeInput);
+        timeRecordList.appendChild(timeItem);
+    });
+}
+
 // 로그아웃 처리
 function handleLogout() {
     if (confirm('로그아웃 하시겠습니까?')) {
         currentUser = null;
         localStorage.removeItem('currentUser');
         todos = {};
+        timeRecords = {};
         noteContent = '';
         showAuth();
     }
@@ -743,6 +803,7 @@ function openPopup(dateString) {
     popupContainer.style.transform = 'translate(0px, 0px)';
     
     renderTodoList();
+    renderTimeRecordList();
     popupOverlay.classList.add('active');
     todoInput.focus();
 }

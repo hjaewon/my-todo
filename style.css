@@ -754,16 +754,16 @@ body::before {
 /* 할일 입력 */
 .todo-input-section {
     display: flex;
-    gap: 10px;
-    margin-bottom: 25px;
+    gap: 8px;
+    margin-bottom: 20px;
 }
 
 .todo-input {
     flex: 1;
-    padding: 15px 20px;
+    padding: 10px 15px;
     border: 2px solid #c5e1a5;
-    border-radius: 15px;
-    font-size: 16px;
+    border-radius: 12px;
+    font-size: 14px;
     transition: all 0.3s ease;
     background: rgba(255, 255, 255, 0.8);
 }
@@ -779,9 +779,9 @@ body::before {
     background: #8bc34a;
     color: white;
     border: none;
-    padding: 15px 30px;
-    border-radius: 15px;
-    font-size: 16px;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -798,18 +798,18 @@ body::before {
 .todo-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    margin-bottom: 25px;
-    min-height: 200px;
+    gap: 8px;
+    margin-bottom: 20px;
+    min-height: 150px;
 }
 
 .todo-item {
     display: flex;
     align-items: center;
-    gap: 15px;
-    padding: 15px 20px;
+    gap: 12px;
+    padding: 10px 15px;
     background: #f1f8e9;
-    border-radius: 15px;
+    border-radius: 12px;
     transition: all 0.3s ease;
     border: 2px solid transparent;
     position: relative;
@@ -828,8 +828,8 @@ body::before {
 .todo-item.completed::before {
     content: '🌿';
     position: absolute;
-    right: 15px;
-    font-size: 20px;
+    right: 12px;
+    font-size: 16px;
     animation: leafAppear 0.5s ease-out;
 }
 
@@ -851,12 +851,12 @@ body::before {
 }
 
 .todo-checkbox {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     cursor: pointer;
     accent-color: #8bc34a;
     flex-shrink: 0;
-    border-radius: 6px;
+    border-radius: 5px;
     transition: all 0.3s ease;
 }
 
@@ -866,12 +866,12 @@ body::before {
 
 .todo-text {
     flex: 1;
-    font-size: 16px;
+    font-size: 14px;
     color: #333;
     border: none;
     background: transparent;
-    padding: 5px;
-    border-radius: 8px;
+    padding: 4px;
+    border-radius: 6px;
     transition: all 0.3s ease;
 }
 
@@ -894,11 +894,11 @@ body::before {
     background: #ff8a80;
     color: white;
     border: none;
-    padding: 8px 15px;
-    border-radius: 10px;
+    padding: 6px 12px;
+    border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-size: 14px;
+    font-size: 13px;
     flex-shrink: 0;
     box-shadow: 0 2px 6px rgba(255, 138, 128, 0.3);
 }
@@ -947,6 +947,99 @@ body::before {
     color: #999;
     padding: 40px;
     font-size: 16px;
+}
+
+/* 구분선 */
+.section-divider {
+    text-align: center;
+    margin: 30px 0 25px;
+    position: relative;
+}
+
+.section-divider::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 2px;
+    background: linear-gradient(to right, transparent, #c5e1a5, transparent);
+}
+
+.divider-text {
+    position: relative;
+    background: white;
+    padding: 0 20px;
+    color: #7cb342;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* 시간별 기록 */
+.time-record-section {
+    margin-top: 10px;
+}
+
+.time-record-list {
+    display: flex;
+    flex-direction: column;
+    border: 2px solid #c5e1a5;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.time-record-item {
+    display: flex;
+    align-items: stretch;
+    border-bottom: 1px solid #e0e0e0;
+    transition: all 0.2s ease;
+}
+
+.time-record-item:last-child {
+    border-bottom: none;
+}
+
+.time-record-item:hover {
+    background: #f1f8e9;
+}
+
+.time-record-item.has-content {
+    background: linear-gradient(135deg, #f1f8e9 0%, #e8f5e9 100%);
+}
+
+.time-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #558b2f;
+    min-width: 100px;
+    max-width: 100px;
+    padding: 10px 12px;
+    background: rgba(139, 195, 74, 0.08);
+    text-align: center;
+    border-right: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.time-input {
+    flex: 1;
+    padding: 10px 15px;
+    border: none;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    background: transparent;
+}
+
+.time-input:focus {
+    outline: none;
+    background: white;
+    box-shadow: inset 0 0 0 1px #8bc34a;
+}
+
+.time-input::placeholder {
+    color: #aaa;
 }
 
 /* 검색 팝업 */
