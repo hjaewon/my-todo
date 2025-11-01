@@ -1,0 +1,599 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    height: 100vh;
+    overflow: hidden;
+}
+
+.app-container {
+    display: flex;
+    height: 100vh;
+    padding: 20px;
+    gap: 20px;
+}
+
+/* 달력 영역 */
+.calendar-section {
+    flex: 2;
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    transition: flex 0.3s ease;
+}
+
+.calendar-section.full-width {
+    flex: 1;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.calendar-title {
+    font-size: 28px;
+    color: #333;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    user-select: none;
+}
+
+.calendar-title:hover {
+    color: #667eea;
+}
+
+.nav-btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.nav-btn:hover {
+    background: #764ba2;
+    transform: scale(1.1);
+}
+
+.calendar-view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.weekday {
+    text-align: center;
+    font-weight: 600;
+    color: #667eea;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    flex: 1;
+}
+
+.calendar-day {
+    background: #f8f9ff;
+    border-radius: 12px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid transparent;
+}
+
+.calendar-day:hover {
+    background: #e8ebff;
+    border-color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.calendar-day.other-month {
+    opacity: 0.3;
+}
+
+.calendar-day.today {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.calendar-day.today .day-number {
+    color: white;
+}
+
+.day-number {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.day-todos {
+    font-size: 12px;
+    color: #666;
+    overflow: hidden;
+}
+
+.todo-indicator {
+    background: #667eea;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    margin-top: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 월 선택 뷰 */
+.month-picker-view {
+    flex: 1;
+    padding: 20px 0;
+}
+
+.month-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    height: 100%;
+}
+
+.month-item {
+    background: #f8f9ff;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.month-item:hover {
+    background: #e8ebff;
+    border-color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.month-item.current-month {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+/* 연도 선택 뷰 */
+.year-picker-view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+}
+
+.year-range-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 0 20px;
+}
+
+.year-range-label {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+}
+
+.year-nav-btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.year-nav-btn:hover {
+    background: #764ba2;
+    transform: scale(1.1);
+}
+
+.year-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    flex: 1;
+}
+
+.year-item {
+    background: #f8f9ff;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.year-item:hover {
+    background: #e8ebff;
+    border-color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.year-item.current-year {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+/* 노트 영역 */
+.note-section {
+    flex: 1;
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+}
+
+.note-section.hidden {
+    display: none;
+}
+
+.note-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.note-header h2 {
+    font-size: 24px;
+    color: #333;
+}
+
+.close-note-btn {
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.close-note-btn:hover {
+    background: #ee5a52;
+    transform: rotate(90deg);
+}
+
+.note-textarea {
+    flex: 1;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    font-size: 16px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    resize: none;
+    transition: border-color 0.3s ease;
+}
+
+.note-textarea:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+/* 노트 열기 버튼 */
+.open-note-btn {
+    position: fixed;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 15px 25px;
+    border-radius: 12px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+    z-index: 100;
+}
+
+.open-note-btn:hover {
+    background: #764ba2;
+    transform: translateY(-50%) scale(1.05);
+}
+
+/* 팝업 */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.popup-overlay.active {
+    display: flex;
+}
+
+.popup-container {
+    background: white;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+}
+
+.popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 30px;
+    border-bottom: 2px solid #f0f0f0;
+    cursor: move;
+    user-select: none;
+}
+
+.popup-header h2 {
+    font-size: 24px;
+    color: #333;
+}
+
+.popup-close-btn {
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.popup-close-btn:hover {
+    background: #ee5a52;
+    transform: rotate(90deg);
+}
+
+.popup-content {
+    padding: 30px;
+    overflow-y: auto;
+    max-height: calc(80vh - 100px);
+}
+
+/* 할일 입력 */
+.todo-input-section {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.todo-input {
+    flex: 1;
+    padding: 15px 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.todo-input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.add-todo-btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.add-todo-btn:hover {
+    background: #764ba2;
+    transform: translateY(-2px);
+}
+
+/* 할일 목록 */
+.todo-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 25px;
+    min-height: 200px;
+}
+
+.todo-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 20px;
+    background: #f8f9ff;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.todo-item:hover {
+    background: #e8ebff;
+    transform: translateX(5px);
+}
+
+.todo-item.completed {
+    opacity: 0.6;
+}
+
+.todo-item.completed .todo-text {
+    text-decoration: line-through;
+    color: #999;
+}
+
+.todo-checkbox {
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    accent-color: #667eea;
+}
+
+.todo-text {
+    flex: 1;
+    font-size: 16px;
+    color: #333;
+    border: none;
+    background: transparent;
+    padding: 5px;
+    border-radius: 6px;
+}
+
+.todo-text:focus {
+    outline: none;
+    background: white;
+}
+
+.todo-text.editing {
+    background: white;
+    border: 2px solid #667eea;
+}
+
+.delete-todo-btn {
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.delete-todo-btn:hover {
+    background: #ee5a52;
+    transform: scale(1.05);
+}
+
+/* 미리보기 툴팁 */
+.preview-tooltip {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    pointer-events: none;
+    z-index: 2000;
+    display: none;
+    max-width: 250px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.preview-tooltip.active {
+    display: block;
+}
+
+.preview-tooltip .preview-title {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #667eea;
+}
+
+.preview-todo-item {
+    padding: 4px 0;
+    font-size: 13px;
+    border-left: 2px solid #667eea;
+    padding-left: 8px;
+    margin: 4px 0;
+}
+
+.no-todos-message {
+    text-align: center;
+    color: #999;
+    padding: 40px;
+    font-size: 16px;
+}
+
+/* 스크롤바 스타일 */
+.popup-content::-webkit-scrollbar,
+.note-textarea::-webkit-scrollbar {
+    width: 8px;
+}
+
+.popup-content::-webkit-scrollbar-track,
+.note-textarea::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.popup-content::-webkit-scrollbar-thumb,
+.note-textarea::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 10px;
+}
+
+.popup-content::-webkit-scrollbar-thumb:hover,
+.note-textarea::-webkit-scrollbar-thumb:hover {
+    background: #764ba2;
+}
+

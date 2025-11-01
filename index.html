@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>할일 앱</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 달력 영역 -->
+        <div class="calendar-section" id="calendarSection">
+            <div class="calendar-header">
+                <button class="nav-btn" id="prevMonth">&lt;</button>
+                <h1 class="calendar-title" id="currentMonth"></h1>
+                <button class="nav-btn" id="nextMonth">&gt;</button>
+            </div>
+            
+            <!-- 기본 달력 뷰 -->
+            <div class="calendar-view" id="calendarView">
+                <div class="calendar-weekdays">
+                    <div class="weekday">일</div>
+                    <div class="weekday">월</div>
+                    <div class="weekday">화</div>
+                    <div class="weekday">수</div>
+                    <div class="weekday">목</div>
+                    <div class="weekday">금</div>
+                    <div class="weekday">토</div>
+                </div>
+                <div class="calendar-grid" id="calendarGrid"></div>
+            </div>
+            
+            <!-- 월 선택 뷰 -->
+            <div class="month-picker-view" id="monthPickerView" style="display: none;">
+                <div class="month-grid" id="monthGrid"></div>
+            </div>
+            
+            <!-- 연도 선택 뷰 -->
+            <div class="year-picker-view" id="yearPickerView" style="display: none;">
+                <div class="year-range-header">
+                    <button class="year-nav-btn" id="prevYearRange">&lt;</button>
+                    <span class="year-range-label" id="yearRangeLabel"></span>
+                    <button class="year-nav-btn" id="nextYearRange">&gt;</button>
+                </div>
+                <div class="year-grid" id="yearGrid"></div>
+            </div>
+        </div>
+
+        <!-- 노트 영역 -->
+        <div class="note-section" id="noteSection">
+            <div class="note-header">
+                <h2>메모장</h2>
+                <button class="close-note-btn" id="closeNoteBtn">✕</button>
+            </div>
+            <textarea class="note-textarea" id="noteTextarea" placeholder="여기에 메모를 작성하세요..."></textarea>
+        </div>
+
+        <!-- 노트 열기 버튼 (노트가 닫혔을 때 표시) -->
+        <button class="open-note-btn" id="openNoteBtn" style="display: none;">메모장 열기</button>
+    </div>
+
+    <!-- 할일 팝업 -->
+    <div class="popup-overlay" id="popupOverlay">
+        <div class="popup-container">
+            <div class="popup-header">
+                <h2 id="popupTitle">할일 관리</h2>
+                <button class="popup-close-btn" id="popupCloseBtn">✕</button>
+            </div>
+            
+            <div class="popup-content">
+                <!-- 할일 입력 영역 -->
+                <div class="todo-input-section">
+                    <input type="text" id="todoInput" class="todo-input" placeholder="할일을 입력하세요">
+                    <button class="add-todo-btn" id="addTodoBtn">추가</button>
+                </div>
+
+                <!-- 할일 목록 -->
+                <div class="todo-list" id="todoList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 미리보기 툴팁 -->
+    <div class="preview-tooltip" id="previewTooltip"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
