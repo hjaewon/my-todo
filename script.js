@@ -656,6 +656,11 @@ function createDayElement(day, year, month, isOtherMonth) {
         indicator.className = 'todo-indicator';
         indicator.textContent = `할일 ${completed}/${count}`;
         dayTodos.appendChild(indicator);
+        
+        // 모든 할일이 완료되었는지 확인
+        if (count > 0 && completed === count) {
+            dayElement.classList.add('all-completed');
+        }
     }
     
     dayElement.appendChild(dayTodos);

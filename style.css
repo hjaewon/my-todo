@@ -5,10 +5,28 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+    background: linear-gradient(180deg, #a8d8ea 0%, #e8f5e9 50%, #fff9c4 100%);
     height: 100vh;
     overflow: hidden;
+    position: relative;
+}
+
+/* 지브리 스타일 구름 배경 */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(ellipse 200px 80px at 20% 30%, rgba(255, 255, 255, 0.6) 0%, transparent 100%),
+        radial-gradient(ellipse 300px 100px at 80% 20%, rgba(255, 255, 255, 0.5) 0%, transparent 100%),
+        radial-gradient(ellipse 250px 90px at 50% 70%, rgba(255, 255, 255, 0.4) 0%, transparent 100%),
+        radial-gradient(ellipse 180px 70px at 10% 80%, rgba(255, 255, 255, 0.5) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
 }
 
 /* 로그인/회원가입 화면 */
@@ -18,32 +36,32 @@ body {
     align-items: center;
     height: 100vh;
     padding: 20px;
+    position: relative;
+    z-index: 1;
 }
 
 .auth-box {
-    background: white;
-    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 30px;
     padding: 50px 40px;
     width: 100%;
     max-width: 450px;
-    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 15px 40px rgba(139, 195, 74, 0.3);
+    border: 3px solid rgba(139, 195, 74, 0.2);
 }
 
 .auth-title {
     font-size: 36px;
     font-weight: 700;
     text-align: center;
-    color: #333;
+    color: #558b2f;
     margin-bottom: 10px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    text-shadow: 2px 2px 4px rgba(139, 195, 74, 0.3);
 }
 
 .auth-subtitle {
     text-align: center;
-    color: #666;
+    color: #7cb342;
     margin-bottom: 40px;
     font-size: 16px;
 }
@@ -63,20 +81,23 @@ body {
 .input-group label {
     font-size: 14px;
     font-weight: 600;
-    color: #333;
+    color: #558b2f;
 }
 
 .auth-input {
     padding: 15px 20px;
-    border: 2px solid #e0e0e0;
-    border-radius: 12px;
+    border: 2px solid #c5e1a5;
+    border-radius: 15px;
     font-size: 16px;
-    transition: border-color 0.3s ease;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.8);
 }
 
 .auth-input:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #8bc34a;
+    background: white;
+    box-shadow: 0 4px 12px rgba(139, 195, 74, 0.2);
 }
 
 .id-check-wrapper {
@@ -89,20 +110,23 @@ body {
 }
 
 .id-check-button {
-    background: #667eea;
+    background: #8bc34a;
     color: white;
     border: none;
     padding: 0 20px;
-    border-radius: 12px;
+    border-radius: 15px;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(139, 195, 74, 0.3);
 }
 
 .id-check-button:hover {
-    background: #764ba2;
+    background: #7cb342;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(139, 195, 74, 0.4);
 }
 
 .id-check-message {
@@ -119,21 +143,23 @@ body {
 }
 
 .auth-button {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #8bc34a 0%, #7cb342 100%);
     color: white;
     border: none;
     padding: 16px;
-    border-radius: 12px;
+    border-radius: 20px;
     font-size: 18px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     margin-top: 10px;
+    box-shadow: 0 6px 16px rgba(139, 195, 74, 0.3);
 }
 
 .auth-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(139, 195, 74, 0.4);
+    background: linear-gradient(135deg, #7cb342 0%, #689f38 100%);
 }
 
 .forgot-password {
@@ -150,14 +176,14 @@ body {
 }
 
 .auth-link {
-    color: #667eea;
+    color: #7cb342;
     font-weight: 600;
     cursor: pointer;
     transition: color 0.3s ease;
 }
 
 .auth-link:hover {
-    color: #764ba2;
+    color: #558b2f;
     text-decoration: underline;
 }
 
@@ -167,15 +193,15 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 15px 20px;
-    background: #f8f9ff;
-    border-radius: 12px;
+    background: #f1f8e9;
+    border-radius: 15px;
     margin-bottom: 20px;
 }
 
 .user-nickname {
     font-size: 16px;
     font-weight: 600;
-    color: #333;
+    color: #558b2f;
 }
 
 .user-nickname::before {
@@ -204,15 +230,18 @@ body {
     height: 100vh;
     padding: 20px;
     gap: 20px;
+    position: relative;
+    z-index: 1;
 }
 
 /* 달력 영역 */
 .calendar-section {
     flex: 2;
-    background: white;
-    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 30px;
     padding: 30px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 15px 40px rgba(139, 195, 74, 0.3);
+    border: 3px solid rgba(139, 195, 74, 0.2);
     display: flex;
     flex-direction: column;
     transition: flex 0.3s ease;
@@ -232,7 +261,7 @@ body {
 
 .calendar-title {
     font-size: 28px;
-    color: #333;
+    color: #558b2f;
     font-weight: 600;
     cursor: pointer;
     transition: color 0.3s ease;
@@ -240,11 +269,11 @@ body {
 }
 
 .calendar-title:hover {
-    color: #667eea;
+    color: #7cb342;
 }
 
 .search-btn {
-    background: #667eea;
+    background: #8bc34a;
     color: white;
     border: none;
     width: 40px;
@@ -254,15 +283,17 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(139, 195, 74, 0.3);
 }
 
 .search-btn:hover {
-    background: #764ba2;
+    background: #7cb342;
     transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(139, 195, 74, 0.4);
 }
 
 .nav-btn {
-    background: #667eea;
+    background: #8bc34a;
     color: white;
     border: none;
     width: 40px;
@@ -271,11 +302,13 @@ body {
     font-size: 20px;
     cursor: pointer;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(139, 195, 74, 0.3);
 }
 
 .nav-btn:hover {
-    background: #764ba2;
+    background: #7cb342;
     transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(139, 195, 74, 0.4);
 }
 
 .calendar-view {
@@ -294,7 +327,7 @@ body {
 .weekday {
     text-align: center;
     font-weight: 600;
-    color: #667eea;
+    color: #7cb342;
     padding: 10px;
     font-size: 16px;
 }
@@ -307,8 +340,8 @@ body {
 }
 
 .calendar-day {
-    background: #f8f9ff;
-    border-radius: 12px;
+    background: #f1f8e9;
+    border-radius: 15px;
     padding: 12px;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -320,10 +353,10 @@ body {
 }
 
 .calendar-day:hover {
-    background: #e8ebff;
-    border-color: #667eea;
+    background: #dcedc8;
+    border-color: #8bc34a;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    box-shadow: 0 4px 12px rgba(139, 195, 74, 0.3);
 }
 
 .calendar-day.other-month {
@@ -331,8 +364,46 @@ body {
 }
 
 .calendar-day.today {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #8bc34a 0%, #7cb342 100%);
     color: white;
+    box-shadow: 0 6px 16px rgba(139, 195, 74, 0.4);
+}
+
+.calendar-day.today::after {
+    content: '🌼';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 14px;
+}
+
+/* 모든 할일 완료 시 토토로 표시 */
+.calendar-day.all-completed::after {
+    content: '🌳';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 18px;
+    animation: totoroBounce 0.6s ease-out;
+}
+
+@keyframes totoroBounce {
+    0% {
+        opacity: 0;
+        transform: scale(0) translateY(-20px);
+    }
+    50% {
+        transform: scale(1.2) translateY(5px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.calendar-day.today.all-completed::after {
+    content: '🌳';
+    font-size: 18px;
 }
 
 .calendar-day.today .day-number {
@@ -353,15 +424,16 @@ body {
 }
 
 .todo-indicator {
-    background: #667eea;
+    background: #8bc34a;
     color: white;
     padding: 4px 8px;
-    border-radius: 6px;
+    border-radius: 8px;
     margin-top: 4px;
     font-size: 11px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    box-shadow: 0 2px 6px rgba(139, 195, 74, 0.3);
 }
 
 /* 월 선택 뷰 */
@@ -378,29 +450,30 @@ body {
 }
 
 .month-item {
-    background: #f8f9ff;
-    border-radius: 12px;
+    background: #f1f8e9;
+    border-radius: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 18px;
     font-weight: 600;
-    color: #333;
+    color: #558b2f;
     cursor: pointer;
     transition: all 0.3s ease;
     border: 2px solid transparent;
 }
 
 .month-item:hover {
-    background: #e8ebff;
-    border-color: #667eea;
+    background: #dcedc8;
+    border-color: #8bc34a;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    box-shadow: 0 4px 12px rgba(139, 195, 74, 0.3);
 }
 
 .month-item.current-month {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #8bc34a 0%, #7cb342 100%);
     color: white;
+    box-shadow: 0 6px 16px rgba(139, 195, 74, 0.4);
 }
 
 /* 연도 선택 뷰 */
@@ -426,7 +499,7 @@ body {
 }
 
 .year-nav-btn {
-    background: #667eea;
+    background: #8bc34a;
     color: white;
     border: none;
     width: 35px;
@@ -435,11 +508,13 @@ body {
     font-size: 18px;
     cursor: pointer;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(139, 195, 74, 0.3);
 }
 
 .year-nav-btn:hover {
-    background: #764ba2;
+    background: #7cb342;
     transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(139, 195, 74, 0.4);
 }
 
 .year-grid {
@@ -450,38 +525,40 @@ body {
 }
 
 .year-item {
-    background: #f8f9ff;
-    border-radius: 12px;
+    background: #f1f8e9;
+    border-radius: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 18px;
     font-weight: 600;
-    color: #333;
+    color: #558b2f;
     cursor: pointer;
     transition: all 0.3s ease;
     border: 2px solid transparent;
 }
 
 .year-item:hover {
-    background: #e8ebff;
-    border-color: #667eea;
+    background: #dcedc8;
+    border-color: #8bc34a;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    box-shadow: 0 4px 12px rgba(139, 195, 74, 0.3);
 }
 
 .year-item.current-year {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #8bc34a 0%, #7cb342 100%);
     color: white;
+    box-shadow: 0 6px 16px rgba(139, 195, 74, 0.4);
 }
 
 /* 노트 영역 */
 .note-section {
     flex: 1;
-    background: white;
-    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 30px;
     padding: 30px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 15px 40px rgba(139, 195, 74, 0.3);
+    border: 3px solid rgba(139, 195, 74, 0.2);
     display: flex;
     flex-direction: column;
     transition: all 0.3s ease;
@@ -500,7 +577,7 @@ body {
 
 .note-header h2 {
     font-size: 24px;
-    color: #333;
+    color: #558b2f;
 }
 
 .close-note-btn {
@@ -522,18 +599,21 @@ body {
 
 .note-textarea {
     flex: 1;
-    border: 2px solid #e0e0e0;
-    border-radius: 12px;
+    border: 2px solid #c5e1a5;
+    border-radius: 15px;
     padding: 20px;
     font-size: 16px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
     resize: none;
-    transition: border-color 0.3s ease;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.8);
 }
 
 .note-textarea:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #8bc34a;
+    background: white;
+    box-shadow: 0 4px 12px rgba(139, 195, 74, 0.2);
 }
 
 /* 노트 열기 버튼 */
@@ -542,21 +622,22 @@ body {
     right: 20px;
     top: 50%;
     transform: translateY(-50%);
-    background: #667eea;
+    background: #8bc34a;
     color: white;
     border: none;
     padding: 15px 25px;
-    border-radius: 12px;
+    border-radius: 20px;
     font-size: 16px;
     cursor: pointer;
-    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 8px 20px rgba(139, 195, 74, 0.3);
     transition: all 0.3s ease;
     z-index: 100;
 }
 
 .open-note-btn:hover {
-    background: #764ba2;
+    background: #7cb342;
     transform: translateY(-50%) scale(1.05);
+    box-shadow: 0 10px 25px rgba(139, 195, 74, 0.4);
 }
 
 /* 팝업 */
@@ -566,7 +647,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(139, 195, 74, 0.2);
     display: none;
     justify-content: center;
     align-items: center;
@@ -578,12 +659,13 @@ body {
 }
 
 .popup-container {
-    background: white;
-    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 30px;
     width: 90%;
     max-width: 600px;
     max-height: 80vh;
-    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 20px 50px rgba(139, 195, 74, 0.4);
+    border: 3px solid rgba(139, 195, 74, 0.3);
     display: flex;
     flex-direction: column;
     position: absolute;
@@ -601,7 +683,7 @@ body {
 
 .popup-header h2 {
     font-size: 24px;
-    color: #333;
+    color: #558b2f;
 }
 
 .popup-close-btn {
@@ -637,32 +719,37 @@ body {
 .todo-input {
     flex: 1;
     padding: 15px 20px;
-    border: 2px solid #e0e0e0;
-    border-radius: 12px;
+    border: 2px solid #c5e1a5;
+    border-radius: 15px;
     font-size: 16px;
-    transition: border-color 0.3s ease;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.8);
 }
 
 .todo-input:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #8bc34a;
+    background: white;
+    box-shadow: 0 4px 12px rgba(139, 195, 74, 0.2);
 }
 
 .add-todo-btn {
-    background: #667eea;
+    background: #8bc34a;
     color: white;
     border: none;
     padding: 15px 30px;
-    border-radius: 12px;
+    border-radius: 15px;
     font-size: 16px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(139, 195, 74, 0.3);
 }
 
 .add-todo-btn:hover {
-    background: #764ba2;
+    background: #7cb342;
     transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(139, 195, 74, 0.4);
 }
 
 /* 할일 목록 */
@@ -679,30 +766,60 @@ body {
     align-items: center;
     gap: 15px;
     padding: 15px 20px;
-    background: #f8f9ff;
-    border-radius: 12px;
+    background: #f1f8e9;
+    border-radius: 15px;
     transition: all 0.3s ease;
+    border: 2px solid transparent;
+    position: relative;
 }
 
 .todo-item:hover {
-    background: #e8ebff;
+    background: #dcedc8;
     transform: translateX(5px);
 }
 
 .todo-item.completed {
-    opacity: 0.6;
+    background: linear-gradient(135deg, #c8e6c9 0%, #a5d6a7 100%);
+    border-color: #81c784;
+}
+
+.todo-item.completed::before {
+    content: '🌿';
+    position: absolute;
+    right: 15px;
+    font-size: 20px;
+    animation: leafAppear 0.5s ease-out;
+}
+
+@keyframes leafAppear {
+    0% {
+        opacity: 0;
+        transform: scale(0) rotate(-180deg);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+    }
 }
 
 .todo-item.completed .todo-text {
     text-decoration: line-through;
-    color: #999;
+    color: #558b2f;
+    opacity: 0.7;
 }
 
 .todo-checkbox {
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
     cursor: pointer;
-    accent-color: #667eea;
+    accent-color: #8bc34a;
+    flex-shrink: 0;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.todo-checkbox:checked {
+    transform: scale(1.1);
 }
 
 .todo-text {
@@ -712,33 +829,42 @@ body {
     border: none;
     background: transparent;
     padding: 5px;
-    border-radius: 6px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
 }
 
 .todo-text:focus {
     outline: none;
     background: white;
+    box-shadow: 0 2px 8px rgba(139, 195, 74, 0.2);
 }
 
 .todo-text.editing {
     background: white;
-    border: 2px solid #667eea;
+    border: 2px solid #8bc34a;
+}
+
+.todo-item.completed .todo-text:disabled {
+    background: transparent;
 }
 
 .delete-todo-btn {
-    background: #ff6b6b;
+    background: #ff8a80;
     color: white;
     border: none;
     padding: 8px 15px;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 14px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(255, 138, 128, 0.3);
 }
 
 .delete-todo-btn:hover {
-    background: #ee5a52;
+    background: #ff5252;
     transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(255, 82, 82, 0.4);
 }
 
 /* 미리보기 툴팁 */
@@ -763,13 +889,13 @@ body {
 .preview-tooltip .preview-title {
     font-weight: 600;
     margin-bottom: 8px;
-    color: #667eea;
+    color: #8bc34a;
 }
 
 .preview-todo-item {
     padding: 4px 0;
     font-size: 13px;
-    border-left: 2px solid #667eea;
+    border-left: 2px solid #8bc34a;
     padding-left: 8px;
     margin: 4px 0;
 }
@@ -795,32 +921,37 @@ body {
 .search-input {
     flex: 1;
     padding: 15px 20px;
-    border: 2px solid #e0e0e0;
-    border-radius: 12px;
+    border: 2px solid #c5e1a5;
+    border-radius: 15px;
     font-size: 16px;
-    transition: border-color 0.3s ease;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.8);
 }
 
 .search-input:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #8bc34a;
+    background: white;
+    box-shadow: 0 4px 12px rgba(139, 195, 74, 0.2);
 }
 
 .search-execute-btn {
-    background: #667eea;
+    background: #8bc34a;
     color: white;
     border: none;
     padding: 15px 30px;
-    border-radius: 12px;
+    border-radius: 15px;
     font-size: 16px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(139, 195, 74, 0.3);
 }
 
 .search-execute-btn:hover {
-    background: #764ba2;
+    background: #7cb342;
     transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(139, 195, 74, 0.4);
 }
 
 .search-results {
@@ -841,26 +972,27 @@ body {
 }
 
 .search-result-date {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #8bc34a 0%, #7cb342 100%);
     color: white;
     padding: 12px 20px;
-    border-radius: 12px;
+    border-radius: 15px;
     font-size: 16px;
     font-weight: 600;
     margin-bottom: 12px;
+    box-shadow: 0 4px 12px rgba(139, 195, 74, 0.3);
 }
 
 .search-result-item {
-    background: #f8f9ff;
+    background: #f1f8e9;
     padding: 15px 20px;
-    border-radius: 10px;
+    border-radius: 15px;
     margin-bottom: 10px;
     transition: all 0.3s ease;
     cursor: pointer;
 }
 
 .search-result-item:hover {
-    background: #e8ebff;
+    background: #dcedc8;
     transform: translateX(5px);
 }
 
@@ -884,10 +1016,16 @@ body {
 
 .search-result-status.completed {
     color: #4caf50;
+    font-weight: 600;
+}
+
+.search-result-status.completed::before {
+    content: '🌿 ';
 }
 
 .search-result-status.pending {
     color: #ff9800;
+    font-weight: 600;
 }
 
 /* 스크롤바 스타일 */
@@ -904,12 +1042,12 @@ body {
 
 .popup-content::-webkit-scrollbar-thumb,
 .note-textarea::-webkit-scrollbar-thumb {
-    background: #667eea;
+    background: #8bc34a;
     border-radius: 10px;
 }
 
 .popup-content::-webkit-scrollbar-thumb:hover,
 .note-textarea::-webkit-scrollbar-thumb:hover {
-    background: #764ba2;
+    background: #7cb342;
 }
 
