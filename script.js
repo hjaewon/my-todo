@@ -1,3 +1,11 @@
+// API 기본 설정
+const API_BASE_URL = 'http://localhost:5000';
+const API_ENDPOINTS = {
+    todos: `${API_BASE_URL}/api/todos`,
+    timeRecords: `${API_BASE_URL}/api/time-records`,
+    notes: `${API_BASE_URL}/api/notes`
+};
+
 // 전역 변수
 let currentDate = new Date();
 let selectedDate = null;
@@ -8,6 +16,7 @@ let viewMode = 'calendar'; // 'calendar', 'month', 'year'
 let yearRangeStart = Math.floor(currentDate.getFullYear() / 12) * 12;
 let currentUser = null;
 let idChecked = false;
+let isLoading = false;
 
 // DOM 요소
 const calendarGrid = document.getElementById('calendarGrid');
@@ -105,32 +114,78 @@ function checkLoginStatus() {
 }
 
 // 사용자 데이터 로드
-function loadUserData() {
-    const userDataKey = `userData_${currentUser.id}`;
-    const userData = localStorage.getItem(userDataKey);
-    
-    if (userData) {
-        const parsed = JSON.parse(userData);
-        todos = parsed.todos || {};
-        timeRecords = parsed.timeRecords || {};
-        noteContent = parsed.noteContent || '';
-    } else {
-        todos = {};
-        timeRecords = {};
-        noteContent = '';
+async function loadUserData() {
+    try {
+        // 백엔드에서 할일 데이터 로드
+        await loadTodosFromAPI();
+        
+        // 시간별 기록과 노트는 로컬스토리지 사용 (백엔드 API 없음)
+        const userDataKey = `userData_${currentUser.id}`;
+        const userData = localStorage.getItem(userDataKey);
+        
+        if (userData) {
+            const parsed = JSON.parse(userData);
+            timeRecords = parsed.timeRecords || {};
+            noteContent = parsed.noteContent || '';
+        } else {
+            timeRecords = {};
+            noteContent = '';
+        }
+        
+        noteTextarea.value = noteContent;
+        userNicknameDisplay.textContent = currentUser.nickname;
+    } catch (error) {
+        console.error('데이터 로드 실패:', error);
+        alert('데이터를 불러오는데 실패했습니다.');
     }
-    
-    noteTextarea.value = noteContent;
-    userNicknameDisplay.textContent = currentUser.nickname;
 }
 
-// 사용자 데이터 저장
+// 백엔드에서 할일 로드
+async function loadTodosFromAPI() {
+    try {
+        const response = await fetch(`${API_ENDPOINTS.todos}?userId=${currentUser.id}`);
+        const result = await response.json();
+        
+        if (result.success) {
+            // 날짜별로 그룹화
+            todos = {};
+            result.data.forEach(todo => {
+                const date = todo.dueDate ? todo.dueDate.split('T')[0] : formatDate(
+                    new Date().getFullYear(),
+                    new Date().getMonth(),
+                    new Date().getDate()
+                );
+                
+                if (!todos[date]) {
+                    todos[date] = [];
+                }
+                
+                todos[date].push({
+                    id: todo._id,
+                    text: todo.title,
+                    completed: todo.completed,
+                    createdAt: todo.createdAt
+                });
+            });
+        }
+    } catch (error) {
+        console.error('할일 로드 실패:', error);
+        // 백엔드 연결 실패 시 로컬스토리지 사용
+        const userDataKey = `userData_${currentUser.id}`;
+        const userData = localStorage.getItem(userDataKey);
+        if (userData) {
+            const parsed = JSON.parse(userData);
+            todos = parsed.todos || {};
+        }
+    }
+}
+
+// 사용자 데이터 저장 (시간기록, 노트만 로컬저장)
 function saveUserData() {
     if (!currentUser) return;
     
     const userDataKey = `userData_${currentUser.id}`;
     const userData = {
-        todos: todos,
         timeRecords: timeRecords,
         noteContent: noteContent
     };
@@ -902,24 +957,49 @@ function createTodoElement(todo, index) {
 }
 
 // 할일 추가
-function addTodo() {
+async function addTodo() {
     const text = todoInput.value.trim();
     if (!text || !selectedDate) return;
     
-    if (!todos[selectedDate]) {
-        todos[selectedDate] = [];
+    try {
+        const response = await fetch(API_ENDPOINTS.todos, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                title: text,
+                dueDate: selectedDate,
+                userId: currentUser.id,
+                completed: false
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // 로컬 데이터 업데이트
+            if (!todos[selectedDate]) {
+                todos[selectedDate] = [];
+            }
+            
+            todos[selectedDate].push({
+                id: result.data._id,
+                text: result.data.title,
+                completed: result.data.completed,
+                createdAt: result.data.createdAt
+            });
+            
+            todoInput.value = '';
+            renderTodoList();
+            renderCalendar();
+        } else {
+            alert('할일 추가에 실패했습니다.');
+        }
+    } catch (error) {
+        console.error('할일 추가 실패:', error);
+        alert('서버와 연결할 수 없습니다.');
     }
-    
-    todos[selectedDate].push({
-        text: text,
-        completed: false,
-        createdAt: new Date().toISOString()
-    });
-    
-    saveTodos();
-    todoInput.value = '';
-    renderTodoList();
-    renderCalendar();
 }
 
 // LIST 추가 다이얼로그 열기
@@ -940,7 +1020,7 @@ function closeListAddDialog() {
 }
 
 // LIST 일괄 추가
-function submitListAdd() {
+async function submitListAdd() {
     if (!selectedDate) return;
     
     const text = listAddTextarea.value.trim();
@@ -957,39 +1037,84 @@ function submitListAdd() {
         return;
     }
     
-    if (!todos[selectedDate]) {
-        todos[selectedDate] = [];
-    }
-    
-    // 각 라인을 할일로 추가
-    lines.forEach(line => {
-        todos[selectedDate].push({
-            text: line,
-            completed: false,
-            createdAt: new Date().toISOString()
+    try {
+        // 각 라인을 백엔드에 추가
+        const promises = lines.map(line => 
+            fetch(API_ENDPOINTS.todos, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: line,
+                    dueDate: selectedDate,
+                    userId: currentUser.id,
+                    completed: false
+                })
+            })
+        );
+        
+        const responses = await Promise.all(promises);
+        const results = await Promise.all(responses.map(r => r.json()));
+        
+        // 로컬 데이터 업데이트
+        if (!todos[selectedDate]) {
+            todos[selectedDate] = [];
+        }
+        
+        results.forEach(result => {
+            if (result.success) {
+                todos[selectedDate].push({
+                    id: result.data._id,
+                    text: result.data.title,
+                    completed: result.data.completed,
+                    createdAt: result.data.createdAt
+                });
+            }
         });
-    });
-    
-    saveTodos();
-    renderTodoList();
-    renderCalendar();
-    closeListAddDialog();
-    
-    alert(`${lines.length}개의 할일이 추가되었습니다!`);
+        
+        renderTodoList();
+        renderCalendar();
+        closeListAddDialog();
+        
+        alert(`${lines.length}개의 할일이 추가되었습니다!`);
+    } catch (error) {
+        console.error('할일 일괄 추가 실패:', error);
+        alert('서버와 연결할 수 없습니다.');
+    }
 }
 
 // 할일 토글
-function toggleTodo(index) {
+async function toggleTodo(index) {
     if (!selectedDate || !todos[selectedDate]) return;
     
-    todos[selectedDate][index].completed = !todos[selectedDate][index].completed;
-    saveTodos();
-    renderTodoList();
-    renderCalendar();
+    const todo = todos[selectedDate][index];
+    
+    try {
+        const response = await fetch(`${API_ENDPOINTS.todos}/${todo.id}/toggle`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            todos[selectedDate][index].completed = result.data.completed;
+            renderTodoList();
+            renderCalendar();
+        } else {
+            alert('상태 변경에 실패했습니다.');
+        }
+    } catch (error) {
+        console.error('할일 토글 실패:', error);
+        alert('서버와 연결할 수 없습니다.');
+    }
 }
 
 // 할일 텍스트 업데이트
-function updateTodoText(index, newText) {
+async function updateTodoText(index, newText) {
     if (!selectedDate || !todos[selectedDate]) return;
     
     const text = newText.trim();
@@ -998,28 +1123,70 @@ function updateTodoText(index, newText) {
         return;
     }
     
-    todos[selectedDate][index].text = text;
-    saveTodos();
-    renderCalendar();
+    const todo = todos[selectedDate][index];
+    
+    try {
+        const response = await fetch(`${API_ENDPOINTS.todos}/${todo.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                title: text,
+                completed: todo.completed,
+                dueDate: selectedDate,
+                userId: currentUser.id
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            todos[selectedDate][index].text = result.data.title;
+            renderCalendar();
+        } else {
+            alert('할일 수정에 실패했습니다.');
+        }
+    } catch (error) {
+        console.error('할일 수정 실패:', error);
+        alert('서버와 연결할 수 없습니다.');
+    }
 }
 
 // 할일 삭제
-function deleteTodo(index) {
+async function deleteTodo(index) {
     if (!selectedDate || !todos[selectedDate]) return;
     
-    todos[selectedDate].splice(index, 1);
+    const todo = todos[selectedDate][index];
     
-    if (todos[selectedDate].length === 0) {
-        delete todos[selectedDate];
+    try {
+        const response = await fetch(`${API_ENDPOINTS.todos}/${todo.id}`, {
+            method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            todos[selectedDate].splice(index, 1);
+            
+            if (todos[selectedDate].length === 0) {
+                delete todos[selectedDate];
+            }
+            
+            renderTodoList();
+            renderCalendar();
+        } else {
+            alert('할일 삭제에 실패했습니다.');
+        }
+    } catch (error) {
+        console.error('할일 삭제 실패:', error);
+        alert('서버와 연결할 수 없습니다.');
     }
-    
-    saveTodos();
-    renderTodoList();
-    renderCalendar();
 }
 
-// 할일 저장
+// 할일 저장 (백엔드 API 사용으로 더 이상 필요 없음, 호환성 유지)
 function saveTodos() {
+    // 시간기록과 노트만 로컬 저장
     saveUserData();
 }
 
