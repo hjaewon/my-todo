@@ -7,7 +7,108 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app-container">
+    <!-- 로그인/회원가입 화면 -->
+    <div class="auth-container" id="authContainer">
+        <!-- 로그인 폼 -->
+        <div class="auth-box" id="loginBox">
+            <h1 class="auth-title">할일 앱</h1>
+            <p class="auth-subtitle">로그인하여 시작하세요</p>
+            
+            <div class="auth-form">
+                <div class="input-group">
+                    <label>아이디</label>
+                    <input type="text" id="loginId" class="auth-input" placeholder="아이디를 입력하세요">
+                </div>
+                
+                <div class="input-group">
+                    <label>비밀번호</label>
+                    <input type="password" id="loginPassword" class="auth-input" placeholder="비밀번호를 입력하세요">
+                </div>
+                
+                <button class="auth-button" id="loginButton">로그인</button>
+                
+                <p class="forgot-password">
+                    <span class="auth-link" id="showForgotPassword">비밀번호 찾기</span>
+                </p>
+                
+                <p class="auth-switch">
+                    계정이 없으신가요? 
+                    <span class="auth-link" id="showSignup">회원가입</span>
+                </p>
+            </div>
+        </div>
+        
+        <!-- 비밀번호 찾기 폼 -->
+        <div class="auth-box" id="forgotPasswordBox" style="display: none;">
+            <h1 class="auth-title">비밀번호 찾기</h1>
+            <p class="auth-subtitle">가입하신 아이디와 이메일을 입력하세요</p>
+            
+            <div class="auth-form">
+                <div class="input-group">
+                    <label>아이디</label>
+                    <input type="text" id="forgotId" class="auth-input" placeholder="아이디를 입력하세요">
+                </div>
+                
+                <div class="input-group">
+                    <label>이메일</label>
+                    <input type="email" id="forgotEmail" class="auth-input" placeholder="가입 시 입력한 이메일을 입력하세요">
+                </div>
+                
+                <button class="auth-button" id="resetPasswordButton">비밀번호 초기화</button>
+                
+                <p class="auth-switch">
+                    <span class="auth-link" id="backToLogin">로그인으로 돌아가기</span>
+                </p>
+            </div>
+        </div>
+        
+        <!-- 회원가입 폼 -->
+        <div class="auth-box" id="signupBox" style="display: none;">
+            <h1 class="auth-title">회원가입</h1>
+            <p class="auth-subtitle">새 계정을 만드세요</p>
+            
+            <div class="auth-form">
+                <div class="input-group">
+                    <label>아이디</label>
+                    <div class="id-check-wrapper">
+                        <input type="text" id="signupId" class="auth-input id-input" placeholder="아이디를 입력하세요">
+                        <button class="id-check-button" id="idCheckButton">중복확인</button>
+                    </div>
+                    <span class="id-check-message" id="idCheckMessage"></span>
+                </div>
+                
+                <div class="input-group">
+                    <label>비밀번호</label>
+                    <input type="password" id="signupPassword" class="auth-input" placeholder="비밀번호를 입력하세요">
+                </div>
+                
+                <div class="input-group">
+                    <label>비밀번호 확인</label>
+                    <input type="password" id="signupPasswordConfirm" class="auth-input" placeholder="비밀번호를 다시 입력하세요">
+                </div>
+                
+                <div class="input-group">
+                    <label>이메일</label>
+                    <input type="email" id="signupEmail" class="auth-input" placeholder="이메일을 입력하세요">
+                </div>
+                
+                <div class="input-group">
+                    <label>닉네임</label>
+                    <input type="text" id="signupNickname" class="auth-input" placeholder="닉네임을 입력하세요">
+                </div>
+                
+                <button class="auth-button" id="signupButton">회원가입</button>
+                
+                <p class="auth-switch">
+                    이미 계정이 있으신가요? 
+                    <span class="auth-link" id="showLogin">로그인</span>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 메인 앱 화면 -->
+    <div class="app-container" id="appContainer" style="display: none;">
         <!-- 달력 영역 -->
         <div class="calendar-section" id="calendarSection">
             <div class="calendar-header">
@@ -15,6 +116,12 @@
                 <h1 class="calendar-title" id="currentMonth"></h1>
                 <button class="nav-btn" id="nextMonth">&gt;</button>
                 <button class="search-btn" id="searchBtn">🔍</button>
+            </div>
+            
+            <!-- 사용자 정보 및 로그아웃 -->
+            <div class="user-info-bar">
+                <span class="user-nickname" id="userNickname"></span>
+                <button class="logout-btn" id="logoutBtn">로그아웃</button>
             </div>
             
             <!-- 기본 달력 뷰 -->

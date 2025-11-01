@@ -1,10 +1,12 @@
 // 전역 변수
 let currentDate = new Date();
 let selectedDate = null;
-let todos = JSON.parse(localStorage.getItem('todos')) || {};
-let noteContent = localStorage.getItem('noteContent') || '';
+let todos = {};
+let noteContent = '';
 let viewMode = 'calendar'; // 'calendar', 'month', 'year'
 let yearRangeStart = Math.floor(currentDate.getFullYear() / 12) * 12;
+let currentUser = null;
+let idChecked = false;
 
 // DOM 요소
 const calendarGrid = document.getElementById('calendarGrid');
@@ -39,11 +41,326 @@ const searchInput = document.getElementById('searchInput');
 const searchExecuteBtn = document.getElementById('searchExecuteBtn');
 const searchResults = document.getElementById('searchResults');
 
+// 인증 관련 요소
+const authContainer = document.getElementById('authContainer');
+const appContainer = document.getElementById('appContainer');
+const loginBox = document.getElementById('loginBox');
+const signupBox = document.getElementById('signupBox');
+const loginId = document.getElementById('loginId');
+const loginPassword = document.getElementById('loginPassword');
+const loginButton = document.getElementById('loginButton');
+const signupId = document.getElementById('signupId');
+const signupPassword = document.getElementById('signupPassword');
+const signupPasswordConfirm = document.getElementById('signupPasswordConfirm');
+const signupEmail = document.getElementById('signupEmail');
+const signupNickname = document.getElementById('signupNickname');
+const signupButton = document.getElementById('signupButton');
+const showSignup = document.getElementById('showSignup');
+const showLogin = document.getElementById('showLogin');
+const forgotPasswordBox = document.getElementById('forgotPasswordBox');
+const showForgotPassword = document.getElementById('showForgotPassword');
+const backToLogin = document.getElementById('backToLogin');
+const forgotId = document.getElementById('forgotId');
+const forgotEmail = document.getElementById('forgotEmail');
+const resetPasswordButton = document.getElementById('resetPasswordButton');
+const idCheckButton = document.getElementById('idCheckButton');
+const idCheckMessage = document.getElementById('idCheckMessage');
+const userNicknameDisplay = document.getElementById('userNickname');
+const logoutBtn = document.getElementById('logoutBtn');
+
 // 초기화
 function init() {
-    noteTextarea.value = noteContent;
-    renderCalendar();
+    checkLoginStatus();
+    setupAuthEventListeners();
     setupEventListeners();
+}
+
+// 로그인 상태 확인
+function checkLoginStatus() {
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        loadUserData();
+        showApp();
+    } else {
+        showAuth();
+    }
+}
+
+// 사용자 데이터 로드
+function loadUserData() {
+    const userDataKey = `userData_${currentUser.id}`;
+    const userData = localStorage.getItem(userDataKey);
+    
+    if (userData) {
+        const parsed = JSON.parse(userData);
+        todos = parsed.todos || {};
+        noteContent = parsed.noteContent || '';
+    } else {
+        todos = {};
+        noteContent = '';
+    }
+    
+    noteTextarea.value = noteContent;
+    userNicknameDisplay.textContent = currentUser.nickname;
+}
+
+// 사용자 데이터 저장
+function saveUserData() {
+    if (!currentUser) return;
+    
+    const userDataKey = `userData_${currentUser.id}`;
+    const userData = {
+        todos: todos,
+        noteContent: noteContent
+    };
+    
+    localStorage.setItem(userDataKey, JSON.stringify(userData));
+}
+
+// 인증 화면 표시
+function showAuth() {
+    authContainer.style.display = 'flex';
+    appContainer.style.display = 'none';
+}
+
+// 앱 화면 표시
+function showApp() {
+    authContainer.style.display = 'none';
+    appContainer.style.display = 'flex';
+    renderCalendar();
+}
+
+// 인증 이벤트 리스너 설정
+function setupAuthEventListeners() {
+    // 로그인/회원가입 화면 전환
+    showSignup.addEventListener('click', () => {
+        loginBox.style.display = 'none';
+        signupBox.style.display = 'block';
+        forgotPasswordBox.style.display = 'none';
+        idChecked = false;
+        idCheckMessage.textContent = '';
+        signupId.value = '';
+        signupPassword.value = '';
+        signupPasswordConfirm.value = '';
+        signupEmail.value = '';
+        signupNickname.value = '';
+    });
+    
+    showLogin.addEventListener('click', () => {
+        signupBox.style.display = 'none';
+        forgotPasswordBox.style.display = 'none';
+        loginBox.style.display = 'block';
+        loginId.value = '';
+        loginPassword.value = '';
+    });
+    
+    // 비밀번호 찾기 화면
+    showForgotPassword.addEventListener('click', () => {
+        loginBox.style.display = 'none';
+        signupBox.style.display = 'none';
+        forgotPasswordBox.style.display = 'block';
+        forgotId.value = '';
+        forgotEmail.value = '';
+    });
+    
+    backToLogin.addEventListener('click', () => {
+        forgotPasswordBox.style.display = 'none';
+        signupBox.style.display = 'none';
+        loginBox.style.display = 'block';
+        loginId.value = '';
+        loginPassword.value = '';
+    });
+    
+    // ID 중복 확인
+    idCheckButton.addEventListener('click', checkIdDuplicate);
+    
+    // ID 입력 시 중복확인 초기화
+    signupId.addEventListener('input', () => {
+        idChecked = false;
+        idCheckMessage.textContent = '';
+    });
+    
+    // 로그인
+    loginButton.addEventListener('click', handleLogin);
+    loginPassword.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleLogin();
+    });
+    
+    // 회원가입
+    signupButton.addEventListener('click', handleSignup);
+    signupNickname.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleSignup();
+    });
+    
+    // 비밀번호 초기화
+    resetPasswordButton.addEventListener('click', handlePasswordReset);
+    forgotEmail.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handlePasswordReset();
+    });
+    
+    // 로그아웃
+    logoutBtn.addEventListener('click', handleLogout);
+}
+
+// ID 중복 확인
+function checkIdDuplicate() {
+    const id = signupId.value.trim();
+    
+    if (!id) {
+        alert('아이디를 입력해주세요.');
+        return;
+    }
+    
+    const users = JSON.parse(localStorage.getItem('users')) || {};
+    
+    if (users[id]) {
+        idCheckMessage.textContent = '이미 사용 중인 아이디입니다.';
+        idCheckMessage.className = 'id-check-message error';
+        idChecked = false;
+    } else {
+        idCheckMessage.textContent = '사용 가능한 아이디입니다.';
+        idCheckMessage.className = 'id-check-message success';
+        idChecked = true;
+    }
+}
+
+// 로그인 처리
+function handleLogin() {
+    const id = loginId.value.trim();
+    const password = loginPassword.value;
+    
+    if (!id || !password) {
+        alert('아이디와 비밀번호를 입력해주세요.');
+        return;
+    }
+    
+    const users = JSON.parse(localStorage.getItem('users')) || {};
+    const user = users[id];
+    
+    if (!user) {
+        alert('존재하지 않는 아이디입니다.');
+        return;
+    }
+    
+    if (user.password !== password) {
+        alert('비밀번호가 일치하지 않습니다.');
+        return;
+    }
+    
+    // 로그인 성공
+    currentUser = user;
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    loadUserData();
+    showApp();
+}
+
+// 회원가입 처리
+function handleSignup() {
+    const id = signupId.value.trim();
+    const password = signupPassword.value;
+    const passwordConfirm = signupPasswordConfirm.value;
+    const email = signupEmail.value.trim();
+    const nickname = signupNickname.value.trim();
+    
+    if (!id || !password || !passwordConfirm || !email || !nickname) {
+        alert('모든 항목을 입력해주세요.');
+        return;
+    }
+    
+    if (!idChecked) {
+        alert('아이디 중복확인을 해주세요.');
+        return;
+    }
+    
+    // 이메일 형식 검증
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        alert('올바른 이메일 형식을 입력해주세요.');
+        return;
+    }
+    
+    if (password !== passwordConfirm) {
+        alert('비밀번호가 일치하지 않습니다.');
+        return;
+    }
+    
+    // 회원가입 처리
+    const users = JSON.parse(localStorage.getItem('users')) || {};
+    
+    users[id] = {
+        id: id,
+        password: password,
+        email: email,
+        nickname: nickname,
+        createdAt: new Date().toISOString()
+    };
+    
+    localStorage.setItem('users', JSON.stringify(users));
+    
+    alert('회원가입이 완료되었습니다!');
+    
+    // 로그인 화면으로 전환
+    signupBox.style.display = 'none';
+    forgotPasswordBox.style.display = 'none';
+    loginBox.style.display = 'block';
+    loginId.value = id;
+    loginPassword.value = '';
+}
+
+// 비밀번호 초기화 처리
+function handlePasswordReset() {
+    const id = forgotId.value.trim();
+    const email = forgotEmail.value.trim();
+    
+    if (!id || !email) {
+        alert('아이디와 이메일을 입력해주세요.');
+        return;
+    }
+    
+    const users = JSON.parse(localStorage.getItem('users')) || {};
+    const user = users[id];
+    
+    if (!user) {
+        alert('존재하지 않는 아이디입니다.');
+        return;
+    }
+    
+    if (user.email !== email) {
+        alert('가입 시 입력한 이메일과 일치하지 않습니다.');
+        return;
+    }
+    
+    // 확인 팝업
+    const confirmed = confirm(`가입한 이메일(${email})로 초기화된 비밀번호를 보내겠습니까?`);
+    
+    if (confirmed) {
+        // 비밀번호 초기화
+        const newPassword = 'init1234!@';
+        users[id].password = newPassword;
+        localStorage.setItem('users', JSON.stringify(users));
+        
+        // 이메일 전송 시뮬레이션
+        // 실제 프로덕션에서는 백엔드 API를 호출하여 이메일을 전송해야 합니다
+        alert(`이메일(${email})로 초기화된 비밀번호를 전송했습니다.\n\n임시 비밀번호: ${newPassword}\n\n로그인 후 비밀번호를 변경해주세요.`);
+        
+        // 로그인 화면으로 전환
+        forgotPasswordBox.style.display = 'none';
+        loginBox.style.display = 'block';
+        loginId.value = id;
+        loginPassword.value = '';
+    }
+}
+
+// 로그아웃 처리
+function handleLogout() {
+    if (confirm('로그아웃 하시겠습니까?')) {
+        currentUser = null;
+        localStorage.removeItem('currentUser');
+        todos = {};
+        noteContent = '';
+        showAuth();
+    }
 }
 
 // 이벤트 리스너 설정
@@ -114,7 +431,7 @@ function setupEventListeners() {
 
     noteTextarea.addEventListener('input', () => {
         noteContent = noteTextarea.value;
-        localStorage.setItem('noteContent', noteContent);
+        saveUserData();
     });
 
     // 팝업 드래그 기능
@@ -516,7 +833,7 @@ function deleteTodo(index) {
 
 // 할일 저장
 function saveTodos() {
-    localStorage.setItem('todos', JSON.stringify(todos));
+    saveUserData();
 }
 
 // 미리보기 표시
