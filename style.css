@@ -1290,3 +1290,370 @@ body::before {
     background: #7cb342;
 }
 
+/* ================================================
+   모바일 반응형 디자인 (768px 이하)
+   ================================================ */
+
+@media (max-width: 768px) {
+    /* 전체 레이아웃 조정 */
+    .app-container {
+        flex-direction: column;
+        padding: 10px;
+        gap: 10px;
+    }
+
+    /* 달력 영역 */
+    .calendar-section {
+        flex: 1;
+        padding: 15px;
+        border-radius: 20px;
+        min-height: 60vh;
+    }
+
+    .calendar-section.full-width {
+        min-height: 80vh;
+    }
+
+    .calendar-header {
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .calendar-title {
+        font-size: 22px;
+        flex: 1;
+        min-width: 150px;
+    }
+
+    .nav-btn, .search-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 18px;
+    }
+
+    /* 사용자 정보 바 */
+    .user-info-bar {
+        padding: 12px 15px;
+        font-size: 14px;
+    }
+
+    .logout-btn {
+        padding: 8px 15px;
+        font-size: 13px;
+    }
+
+    /* 달력 그리드 */
+    .weekday {
+        font-size: 13px;
+        padding: 6px;
+    }
+
+    .calendar-grid {
+        gap: 6px;
+    }
+
+    .calendar-day {
+        min-height: 60px;
+        padding: 8px;
+        border-radius: 10px;
+    }
+
+    .day-number {
+        font-size: 15px;
+    }
+
+    .todo-indicator {
+        font-size: 9px;
+        padding: 3px 6px;
+    }
+
+    /* 노트 영역 */
+    .note-section {
+        flex: none;
+        height: 35vh;
+        padding: 15px;
+        border-radius: 20px;
+    }
+
+    .note-header h2 {
+        font-size: 20px;
+    }
+
+    .close-note-btn {
+        width: 30px;
+        height: 30px;
+        font-size: 18px;
+    }
+
+    .note-textarea {
+        font-size: 14px;
+        padding: 15px;
+    }
+
+    .open-note-btn {
+        right: 10px;
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+
+    /* 팝업 */
+    .popup-container {
+        width: 95%;
+        max-width: 95%;
+        max-height: 90vh;
+        border-radius: 20px;
+    }
+
+    .popup-header {
+        padding: 20px;
+    }
+
+    .popup-header h2 {
+        font-size: 20px;
+    }
+
+    .popup-close-btn {
+        width: 30px;
+        height: 30px;
+        font-size: 18px;
+    }
+
+    .popup-content {
+        padding: 20px;
+    }
+
+    /* 할일 입력 */
+    .todo-input-section {
+        flex-wrap: wrap;
+    }
+
+    .todo-input {
+        width: 100%;
+        padding: 12px 15px;
+        font-size: 15px;
+    }
+
+    .add-todo-btn, .add-list-btn {
+        flex: 1;
+        padding: 12px;
+        font-size: 15px;
+    }
+
+    /* 할일 목록 */
+    .todo-list {
+        min-height: 100px;
+    }
+
+    .todo-item {
+        padding: 12px;
+        gap: 10px;
+    }
+
+    .todo-checkbox {
+        width: 22px;
+        height: 22px;
+    }
+
+    .todo-text {
+        font-size: 15px;
+    }
+
+    .delete-todo-btn {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    /* 구분선 */
+    .divider-text {
+        font-size: 14px;
+        padding: 0 15px;
+    }
+
+    /* 시간별 기록 */
+    .time-record-item {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 0;
+    }
+
+    .time-label {
+        min-width: 100%;
+        max-width: 100%;
+        padding: 10px;
+        border-right: none;
+        border-bottom: 1px solid #e0e0e0;
+        border-radius: 0;
+    }
+
+    .time-input {
+        padding: 12px 15px;
+        font-size: 15px;
+    }
+
+    /* LIST 추가 다이얼로그 */
+    .list-add-guide {
+        padding: 12px 15px;
+    }
+
+    .list-add-guide p {
+        font-size: 13px;
+    }
+
+    .list-add-textarea {
+        min-height: 250px;
+        padding: 12px;
+        font-size: 15px;
+    }
+
+    .list-add-actions {
+        flex-direction: column;
+    }
+
+    .list-add-submit-btn, .list-add-cancel-btn {
+        width: 100%;
+        padding: 15px;
+    }
+
+    /* 검색 팝업 */
+    .search-input-section {
+        flex-wrap: wrap;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 12px 15px;
+        font-size: 15px;
+    }
+
+    .search-execute-btn {
+        width: 100%;
+        padding: 12px;
+        font-size: 15px;
+    }
+
+    .search-results {
+        min-height: 200px;
+        max-height: 300px;
+    }
+
+    .search-result-date {
+        padding: 10px 15px;
+        font-size: 15px;
+    }
+
+    .search-result-item {
+        padding: 12px 15px;
+    }
+
+    .search-result-text {
+        font-size: 14px;
+    }
+
+    /* 월/연도 선택 */
+    .month-grid, .year-grid {
+        gap: 10px;
+    }
+
+    .month-item, .year-item {
+        font-size: 16px;
+        padding: 15px;
+    }
+
+    .year-range-header {
+        padding: 0 10px;
+    }
+
+    .year-range-label {
+        font-size: 18px;
+    }
+
+    /* 로그인/회원가입 */
+    .auth-box {
+        padding: 30px 25px;
+        border-radius: 20px;
+    }
+
+    .auth-title {
+        font-size: 30px;
+    }
+
+    .auth-subtitle {
+        font-size: 15px;
+    }
+
+    .auth-input {
+        padding: 13px 18px;
+        font-size: 15px;
+    }
+
+    .auth-button {
+        padding: 15px;
+        font-size: 17px;
+    }
+
+    .id-check-button {
+        padding: 0 18px;
+        font-size: 13px;
+    }
+
+    /* 미리보기 툴팁 (모바일에서 비활성화) */
+    .preview-tooltip {
+        display: none !important;
+    }
+
+    /* 터치 영역 확대 */
+    .calendar-day {
+        min-height: 55px;
+    }
+
+    /* 본인 확인 성공 메시지 */
+    .verify-success {
+        padding: 15px;
+    }
+
+    .verify-success .success-icon {
+        width: 45px;
+        height: 45px;
+        line-height: 45px;
+        font-size: 24px;
+    }
+
+    .verify-success p {
+        font-size: 15px;
+    }
+}
+
+/* 작은 모바일 (480px 이하) */
+@media (max-width: 480px) {
+    .calendar-title {
+        font-size: 18px;
+    }
+
+    .nav-btn, .search-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+    }
+
+    .calendar-day {
+        min-height: 50px;
+        padding: 6px;
+    }
+
+    .day-number {
+        font-size: 14px;
+    }
+
+    .popup-header h2 {
+        font-size: 18px;
+    }
+
+    .auth-title {
+        font-size: 26px;
+    }
+
+    .month-grid, .year-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
