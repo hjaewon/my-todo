@@ -187,6 +187,48 @@ body::before {
     text-decoration: underline;
 }
 
+/* 본인 확인 성공 메시지 */
+.verify-success {
+    background: linear-gradient(135deg, #c8e6c9 0%, #a5d6a7 100%);
+    border: 2px solid #81c784;
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 25px;
+    animation: successAppear 0.5s ease-out;
+}
+
+@keyframes successAppear {
+    0% {
+        opacity: 0;
+        transform: scale(0.9) translateY(-10px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.verify-success .success-icon {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    background: #4caf50;
+    color: white;
+    border-radius: 50%;
+    line-height: 50px;
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.verify-success p {
+    color: #2e7d32;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+}
+
 /* 사용자 정보 바 */
 .user-info-bar {
     display: flex;

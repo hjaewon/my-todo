@@ -62,7 +62,14 @@ const showForgotPassword = document.getElementById('showForgotPassword');
 const backToLogin = document.getElementById('backToLogin');
 const forgotId = document.getElementById('forgotId');
 const forgotEmail = document.getElementById('forgotEmail');
-const resetPasswordButton = document.getElementById('resetPasswordButton');
+const verifyButton = document.getElementById('verifyButton');
+const verifyStep = document.getElementById('verifyStep');
+const changePasswordStep = document.getElementById('changePasswordStep');
+const newPassword = document.getElementById('newPassword');
+const newPasswordConfirm = document.getElementById('newPasswordConfirm');
+const changePasswordButton = document.getElementById('changePasswordButton');
+const forgotSubtitle = document.getElementById('forgotSubtitle');
+let verifiedUserId = null;
 const idCheckButton = document.getElementById('idCheckButton');
 const idCheckMessage = document.getElementById('idCheckMessage');
 const userNicknameDisplay = document.getElementById('userNickname');
@@ -160,8 +167,7 @@ function setupAuthEventListeners() {
         loginBox.style.display = 'none';
         signupBox.style.display = 'none';
         forgotPasswordBox.style.display = 'block';
-        forgotId.value = '';
-        forgotEmail.value = '';
+        resetPasswordChangeForm();
     });
     
     backToLogin.addEventListener('click', () => {
@@ -170,6 +176,7 @@ function setupAuthEventListeners() {
         loginBox.style.display = 'block';
         loginId.value = '';
         loginPassword.value = '';
+        resetPasswordChangeForm();
     });
     
     // ID 중복 확인
@@ -193,10 +200,16 @@ function setupAuthEventListeners() {
         if (e.key === 'Enter') handleSignup();
     });
     
-    // 비밀번호 초기화
-    resetPasswordButton.addEventListener('click', handlePasswordReset);
+    // 본인 확인
+    verifyButton.addEventListener('click', handleVerifyUser);
     forgotEmail.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') handlePasswordReset();
+        if (e.key === 'Enter') handleVerifyUser();
+    });
+    
+    // 비밀번호 변경
+    changePasswordButton.addEventListener('click', handleChangePassword);
+    newPasswordConfirm.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleChangePassword();
     });
     
     // 로그아웃
@@ -308,8 +321,20 @@ function handleSignup() {
     loginPassword.value = '';
 }
 
-// 비밀번호 초기화 처리
-function handlePasswordReset() {
+// 비밀번호 변경 폼 초기화
+function resetPasswordChangeForm() {
+    verifyStep.style.display = 'block';
+    changePasswordStep.style.display = 'none';
+    forgotId.value = '';
+    forgotEmail.value = '';
+    newPassword.value = '';
+    newPasswordConfirm.value = '';
+    verifiedUserId = null;
+    forgotSubtitle.textContent = '가입하신 아이디와 이메일을 입력하세요';
+}
+
+// 본인 확인 처리
+function handleVerifyUser() {
     const id = forgotId.value.trim();
     const email = forgotEmail.value.trim();
     
@@ -331,25 +356,46 @@ function handlePasswordReset() {
         return;
     }
     
-    // 확인 팝업
-    const confirmed = confirm(`가입한 이메일(${email})로 초기화된 비밀번호를 보내겠습니까?`);
-    
-    if (confirmed) {
-        // 비밀번호 초기화
-        const newPassword = 'init1234!@';
-        users[id].password = newPassword;
-        localStorage.setItem('users', JSON.stringify(users));
-        
-        // 이메일 전송 시뮬레이션
-        // 실제 프로덕션에서는 백엔드 API를 호출하여 이메일을 전송해야 합니다
-        alert(`이메일(${email})로 초기화된 비밀번호를 전송했습니다.\n\n임시 비밀번호: ${newPassword}\n\n로그인 후 비밀번호를 변경해주세요.`);
-        
-        // 로그인 화면으로 전환
-        forgotPasswordBox.style.display = 'none';
-        loginBox.style.display = 'block';
-        loginId.value = id;
-        loginPassword.value = '';
+    // 본인 확인 성공
+    verifiedUserId = id;
+    verifyStep.style.display = 'none';
+    changePasswordStep.style.display = 'block';
+    forgotSubtitle.textContent = '새로운 비밀번호를 입력하세요';
+}
+
+// 비밀번호 변경 처리
+function handleChangePassword() {
+    if (!verifiedUserId) {
+        alert('본인 확인을 먼저 진행해주세요.');
+        return;
     }
+    
+    const password = newPassword.value;
+    const passwordConfirm = newPasswordConfirm.value;
+    
+    if (!password || !passwordConfirm) {
+        alert('새 비밀번호를 입력해주세요.');
+        return;
+    }
+    
+    if (password !== passwordConfirm) {
+        alert('비밀번호가 일치하지 않습니다.');
+        return;
+    }
+    
+    // 비밀번호 변경
+    const users = JSON.parse(localStorage.getItem('users')) || {};
+    users[verifiedUserId].password = password;
+    localStorage.setItem('users', JSON.stringify(users));
+    
+    alert('비밀번호가 성공적으로 변경되었습니다!');
+    
+    // 로그인 화면으로 전환
+    forgotPasswordBox.style.display = 'none';
+    loginBox.style.display = 'block';
+    loginId.value = verifiedUserId;
+    loginPassword.value = '';
+    resetPasswordChangeForm();
 }
 
 // 로그아웃 처리
