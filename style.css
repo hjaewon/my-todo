@@ -613,6 +613,35 @@ body::before {
     text-transform: uppercase;
 }
 
+.note-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.save-note-btn {
+    background: #000000;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 0;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.save-note-btn:hover {
+    background: #333333;
+}
+
+.save-note-btn.saved {
+    background: #666666;
+    cursor: default;
+}
+
 .close-note-btn {
     background: #000000;
     color: white;
@@ -1395,6 +1424,15 @@ body::before {
         letter-spacing: 1.5px;
     }
 
+    .note-actions {
+        gap: 8px;
+    }
+
+    .save-note-btn {
+        padding: 8px 14px;
+        font-size: 10px;
+    }
+
     .close-note-btn {
         width: 32px;
         height: 32px;
@@ -1859,6 +1897,11 @@ body::before {
     .note-header h2 {
         font-size: 12px;
         letter-spacing: 1px;
+    }
+
+    .save-note-btn {
+        padding: 7px 12px;
+        font-size: 9px;
     }
 
     .close-note-btn {

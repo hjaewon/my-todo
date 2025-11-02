@@ -1,9 +1,10 @@
 // API 기본 설정
 const API_BASE_URL = 'http://localhost:5000';
 const API_ENDPOINTS = {
+    users: `${API_BASE_URL}/api/users`,
     todos: `${API_BASE_URL}/api/todos`,
-    timeRecords: `${API_BASE_URL}/api/time-records`,
-    notes: `${API_BASE_URL}/api/notes`
+    activities: `${API_BASE_URL}/api/activities`,
+    memos: `${API_BASE_URL}/api/memo`
 };
 
 // 전역 변수
@@ -34,6 +35,7 @@ const calendarSection = document.getElementById('calendarSection');
 const closeNoteBtn = document.getElementById('closeNoteBtn');
 const openNoteBtn = document.getElementById('openNoteBtn');
 const noteTextarea = document.getElementById('noteTextarea');
+const saveNoteBtn = document.getElementById('saveNoteBtn');
 const previewTooltip = document.getElementById('previewTooltip');
 const popupContainer = document.querySelector('.popup-container');
 const calendarView = document.getElementById('calendarView');
@@ -119,18 +121,8 @@ async function loadUserData() {
         // 백엔드에서 할일 데이터 로드
         await loadTodosFromAPI();
         
-        // 시간별 기록과 노트는 로컬스토리지 사용 (백엔드 API 없음)
-        const userDataKey = `userData_${currentUser.id}`;
-        const userData = localStorage.getItem(userDataKey);
-        
-        if (userData) {
-            const parsed = JSON.parse(userData);
-            timeRecords = parsed.timeRecords || {};
-            noteContent = parsed.noteContent || '';
-        } else {
-            timeRecords = {};
-            noteContent = '';
-        }
+        // 메모 데이터 로드
+        await loadMemoFromAPI();
         
         noteTextarea.value = noteContent;
         userNicknameDisplay.textContent = currentUser.nickname;
@@ -140,21 +132,32 @@ async function loadUserData() {
     }
 }
 
+// 백엔드에서 메모 로드
+async function loadMemoFromAPI() {
+    try {
+        const response = await fetch(`${API_ENDPOINTS.memos}`);
+        const result = await response.json();
+        
+        if (result.success) {
+            noteContent = result.data.content || '';
+        }
+    } catch (error) {
+        console.error('메모 로드 실패:', error);
+        noteContent = '';
+    }
+}
+
 // 백엔드에서 할일 로드
 async function loadTodosFromAPI() {
     try {
-        const response = await fetch(`${API_ENDPOINTS.todos}?userId=${currentUser.id}`);
+        const response = await fetch(`${API_ENDPOINTS.todos}`);
         const result = await response.json();
         
         if (result.success) {
             // 날짜별로 그룹화
             todos = {};
             result.data.forEach(todo => {
-                const date = todo.dueDate ? todo.dueDate.split('T')[0] : formatDate(
-                    new Date().getFullYear(),
-                    new Date().getMonth(),
-                    new Date().getDate()
-                );
+                const date = todo.date;
                 
                 if (!todos[date]) {
                     todos[date] = [];
@@ -162,7 +165,7 @@ async function loadTodosFromAPI() {
                 
                 todos[date].push({
                     id: todo._id,
-                    text: todo.title,
+                    text: todo.task,
                     completed: todo.completed,
                     createdAt: todo.createdAt
                 });
@@ -170,27 +173,65 @@ async function loadTodosFromAPI() {
         }
     } catch (error) {
         console.error('할일 로드 실패:', error);
-        // 백엔드 연결 실패 시 로컬스토리지 사용
-        const userDataKey = `userData_${currentUser.id}`;
-        const userData = localStorage.getItem(userDataKey);
-        if (userData) {
-            const parsed = JSON.parse(userData);
-            todos = parsed.todos || {};
-        }
+        todos = {};
     }
 }
 
-// 사용자 데이터 저장 (시간기록, 노트만 로컬저장)
-function saveUserData() {
-    if (!currentUser) return;
+// 메모 저장 (백엔드)
+async function saveMemo() {
+    if (!currentUser) return false;
     
-    const userDataKey = `userData_${currentUser.id}`;
-    const userData = {
-        timeRecords: timeRecords,
-        noteContent: noteContent
-    };
+    try {
+        const response = await fetch(`${API_ENDPOINTS.memos}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ content: noteContent })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            return true;
+        } else {
+            alert('메모 저장에 실패했습니다.');
+            return false;
+        }
+    } catch (error) {
+        console.error('메모 저장 실패:', error);
+        alert('서버와 연결할 수 없습니다.');
+        return false;
+    }
+}
+
+// 시간별 기록 저장 (백엔드)
+async function saveTimeRecords(date) {
+    if (!currentUser || !date) return;
     
-    localStorage.setItem(userDataKey, JSON.stringify(userData));
+    try {
+        // 해당 날짜의 모든 시간 데이터 수집
+        const hourData = {};
+        for (let hour = 9; hour <= 22; hour++) {
+            const timeKey = `${hour}:00`;
+            const recordKey = `${date}_${timeKey}`;
+            const hourField = `hour_${String(hour).padStart(2, '0')}_${String(hour + 1).padStart(2, '0')}`;
+            hourData[hourField] = timeRecords[recordKey] || '';
+        }
+        
+        await fetch(`${API_ENDPOINTS.activities}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                date: date,
+                ...hourData
+            })
+        });
+    } catch (error) {
+        console.error('시간별 기록 저장 실패:', error);
+    }
 }
 
 // 인증 화면 표시
@@ -285,7 +326,7 @@ function setupAuthEventListeners() {
 }
 
 // ID 중복 확인
-function checkIdDuplicate() {
+async function checkIdDuplicate() {
     const id = signupId.value.trim();
     
     if (!id) {
@@ -293,58 +334,75 @@ function checkIdDuplicate() {
         return;
     }
     
-    const users = JSON.parse(localStorage.getItem('users')) || {};
-    
-    if (users[id]) {
-        idCheckMessage.textContent = '이미 사용 중인 아이디입니다.';
-        idCheckMessage.className = 'id-check-message error';
-        idChecked = false;
-    } else {
-        idCheckMessage.textContent = '사용 가능한 아이디입니다.';
-        idCheckMessage.className = 'id-check-message success';
-        idChecked = true;
+    try {
+        const response = await fetch(`${API_ENDPOINTS.users}/check-userid/${id}`);
+        const result = await response.json();
+        
+        if (result.available) {
+            idCheckMessage.textContent = '사용 가능한 아이디입니다.';
+            idCheckMessage.className = 'id-check-message success';
+            idChecked = true;
+        } else {
+            idCheckMessage.textContent = '이미 사용 중인 아이디입니다.';
+            idCheckMessage.className = 'id-check-message error';
+            idChecked = false;
+        }
+    } catch (error) {
+        console.error('ID 중복 확인 실패:', error);
+        alert('서버와 연결할 수 없습니다.');
     }
 }
 
 // 로그인 처리
-function handleLogin() {
-    const id = loginId.value.trim();
+async function handleLogin() {
+    const userId = loginId.value.trim();
     const password = loginPassword.value;
     
-    if (!id || !password) {
+    if (!userId || !password) {
         alert('아이디와 비밀번호를 입력해주세요.');
         return;
     }
     
-    const users = JSON.parse(localStorage.getItem('users')) || {};
-    const user = users[id];
-    
-    if (!user) {
-        alert('존재하지 않는 아이디입니다.');
-        return;
+    try {
+        const response = await fetch(`${API_ENDPOINTS.users}/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userId, password })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // 로그인 성공
+            currentUser = {
+                id: result.data.userId,
+                userId: result.data.userId,
+                email: result.data.email,
+                nickname: result.data.nickname
+            };
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            await loadUserData();
+            showApp();
+        } else {
+            alert(result.message || '로그인에 실패했습니다.');
+        }
+    } catch (error) {
+        console.error('로그인 실패:', error);
+        alert('서버와 연결할 수 없습니다.');
     }
-    
-    if (user.password !== password) {
-        alert('비밀번호가 일치하지 않습니다.');
-        return;
-    }
-    
-    // 로그인 성공
-    currentUser = user;
-    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-    loadUserData();
-    showApp();
 }
 
 // 회원가입 처리
-function handleSignup() {
-    const id = signupId.value.trim();
+async function handleSignup() {
+    const userId = signupId.value.trim();
     const password = signupPassword.value;
     const passwordConfirm = signupPasswordConfirm.value;
     const email = signupEmail.value.trim();
     const nickname = signupNickname.value.trim();
     
-    if (!id || !password || !passwordConfirm || !email || !nickname) {
+    if (!userId || !password || !passwordConfirm || !email || !nickname) {
         alert('모든 항목을 입력해주세요.');
         return;
     }
@@ -366,27 +424,33 @@ function handleSignup() {
         return;
     }
     
-    // 회원가입 처리
-    const users = JSON.parse(localStorage.getItem('users')) || {};
-    
-    users[id] = {
-        id: id,
-        password: password,
-        email: email,
-        nickname: nickname,
-        createdAt: new Date().toISOString()
-    };
-    
-    localStorage.setItem('users', JSON.stringify(users));
-    
-    alert('회원가입이 완료되었습니다!');
-    
-    // 로그인 화면으로 전환
-    signupBox.style.display = 'none';
-    forgotPasswordBox.style.display = 'none';
-    loginBox.style.display = 'block';
-    loginId.value = id;
-    loginPassword.value = '';
+    try {
+        const response = await fetch(`${API_ENDPOINTS.users}/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userId, password, email, nickname })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('회원가입이 완료되었습니다!');
+            
+            // 로그인 화면으로 전환
+            signupBox.style.display = 'none';
+            forgotPasswordBox.style.display = 'none';
+            loginBox.style.display = 'block';
+            loginId.value = userId;
+            loginPassword.value = '';
+        } else {
+            alert(result.message || '회원가입에 실패했습니다.');
+        }
+    } catch (error) {
+        console.error('회원가입 실패:', error);
+        alert('서버와 연결할 수 없습니다.');
+    }
 }
 
 // 비밀번호 변경 폼 초기화
@@ -402,37 +466,43 @@ function resetPasswordChangeForm() {
 }
 
 // 본인 확인 처리
-function handleVerifyUser() {
-    const id = forgotId.value.trim();
+async function handleVerifyUser() {
+    const userId = forgotId.value.trim();
     const email = forgotEmail.value.trim();
     
-    if (!id || !email) {
+    if (!userId || !email) {
         alert('아이디와 이메일을 입력해주세요.');
         return;
     }
     
-    const users = JSON.parse(localStorage.getItem('users')) || {};
-    const user = users[id];
-    
-    if (!user) {
-        alert('존재하지 않는 아이디입니다.');
-        return;
+    try {
+        const response = await fetch(`${API_ENDPOINTS.users}/verify`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userId, email })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success && result.verified) {
+            // 본인 확인 성공
+            verifiedUserId = userId;
+            verifyStep.style.display = 'none';
+            changePasswordStep.style.display = 'block';
+            forgotSubtitle.textContent = '새로운 비밀번호를 입력하세요';
+        } else {
+            alert(result.message || '일치하는 사용자 정보가 없습니다.');
+        }
+    } catch (error) {
+        console.error('본인 확인 실패:', error);
+        alert('서버와 연결할 수 없습니다.');
     }
-    
-    if (user.email !== email) {
-        alert('가입 시 입력한 이메일과 일치하지 않습니다.');
-        return;
-    }
-    
-    // 본인 확인 성공
-    verifiedUserId = id;
-    verifyStep.style.display = 'none';
-    changePasswordStep.style.display = 'block';
-    forgotSubtitle.textContent = '새로운 비밀번호를 입력하세요';
 }
 
 // 비밀번호 변경 처리
-function handleChangePassword() {
+async function handleChangePassword() {
     if (!verifiedUserId) {
         alert('본인 확인을 먼저 진행해주세요.');
         return;
@@ -440,6 +510,7 @@ function handleChangePassword() {
     
     const password = newPassword.value;
     const passwordConfirm = newPasswordConfirm.value;
+    const email = forgotEmail.value.trim();
     
     if (!password || !passwordConfirm) {
         alert('새 비밀번호를 입력해주세요.');
@@ -451,24 +522,65 @@ function handleChangePassword() {
         return;
     }
     
-    // 비밀번호 변경
-    const users = JSON.parse(localStorage.getItem('users')) || {};
-    users[verifiedUserId].password = password;
-    localStorage.setItem('users', JSON.stringify(users));
-    
-    alert('비밀번호가 성공적으로 변경되었습니다!');
-    
-    // 로그인 화면으로 전환
-    forgotPasswordBox.style.display = 'none';
-    loginBox.style.display = 'block';
-    loginId.value = verifiedUserId;
-    loginPassword.value = '';
-    resetPasswordChangeForm();
+    try {
+        const response = await fetch(`${API_ENDPOINTS.users}/change-password`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                userId: verifiedUserId,
+                email: email,
+                newPassword: password
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('비밀번호가 성공적으로 변경되었습니다!');
+            
+            // 로그인 화면으로 전환
+            forgotPasswordBox.style.display = 'none';
+            loginBox.style.display = 'block';
+            loginId.value = verifiedUserId;
+            loginPassword.value = '';
+            resetPasswordChangeForm();
+        } else {
+            alert(result.message || '비밀번호 변경에 실패했습니다.');
+        }
+    } catch (error) {
+        console.error('비밀번호 변경 실패:', error);
+        alert('서버와 연결할 수 없습니다.');
+    }
+}
+
+// 백엔드에서 시간별 기록 로드
+async function loadTimeRecordsFromAPI(date) {
+    try {
+        const response = await fetch(`${API_ENDPOINTS.activities}/${date}`);
+        const result = await response.json();
+        
+        if (result.success && result.data) {
+            // 백엔드 데이터를 timeRecords 형식으로 변환
+            for (let hour = 9; hour <= 22; hour++) {
+                const timeKey = `${hour}:00`;
+                const recordKey = `${date}_${timeKey}`;
+                const hourField = `hour_${String(hour).padStart(2, '0')}_${String(hour + 1).padStart(2, '0')}`;
+                timeRecords[recordKey] = result.data[hourField] || '';
+            }
+        }
+    } catch (error) {
+        console.error('시간별 기록 로드 실패:', error);
+    }
 }
 
 // 시간별 기록 렌더링
-function renderTimeRecordList() {
+async function renderTimeRecordList() {
     if (!selectedDate) return;
+    
+    // 백엔드에서 데이터 로드
+    await loadTimeRecordsFromAPI(selectedDate);
     
     const timeSlots = [];
     // 오전 9시부터 오후 10시까지 (9:00 ~ 22:00)
@@ -477,7 +589,7 @@ function renderTimeRecordList() {
         const endHour = String(hour + 1).padStart(2, '0');
         const timeKey = `${hour}:00`;
         const label = `${startHour}:00~${endHour}:00`;
-        timeSlots.push({ timeKey, label });
+        timeSlots.push({ timeKey, label, hour });
     }
     
     timeRecordList.innerHTML = '';
@@ -508,10 +620,14 @@ function renderTimeRecordList() {
                 timeRecords[recordKey] = value;
                 timeItem.classList.add('has-content');
             } else {
-                delete timeRecords[recordKey];
+                timeRecords[recordKey] = '';
                 timeItem.classList.remove('has-content');
             }
-            saveUserData();
+            // 디바운스를 위해 타이머 사용
+            clearTimeout(timeInput.saveTimer);
+            timeInput.saveTimer = setTimeout(() => {
+                saveTimeRecords(selectedDate);
+            }, 1000);
         });
         
         timeItem.appendChild(timeLabel);
@@ -529,6 +645,9 @@ function handleLogout() {
         timeRecords = {};
         noteContent = '';
         showAuth();
+        // 입력 필드 초기화
+        loginId.value = '';
+        loginPassword.value = '';
     }
 }
 
@@ -608,10 +727,27 @@ function setupEventListeners() {
 
     closeNoteBtn.addEventListener('click', closeNote);
     openNoteBtn.addEventListener('click', openNote);
+    
+    // 메모장 저장 버튼
+    saveNoteBtn.addEventListener('click', async () => {
+        noteContent = noteTextarea.value;
+        const success = await saveMemo();
+        if (success) {
+            // 저장 완료 표시
+            saveNoteBtn.textContent = '저장됨';
+            saveNoteBtn.classList.add('saved');
+            setTimeout(() => {
+                saveNoteBtn.textContent = '저장';
+                saveNoteBtn.classList.remove('saved');
+            }, 2000);
+        }
+    });
 
     noteTextarea.addEventListener('input', () => {
         noteContent = noteTextarea.value;
-        saveUserData();
+        // 입력 시 저장 버튼 활성화 표시
+        saveNoteBtn.textContent = '저장';
+        saveNoteBtn.classList.remove('saved');
     });
 
     // 팝업 드래그 기능
@@ -968,9 +1104,8 @@ async function addTodo() {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                title: text,
-                dueDate: selectedDate,
-                userId: currentUser.id,
+                date: selectedDate,
+                task: text,
                 completed: false
             })
         });
@@ -985,7 +1120,7 @@ async function addTodo() {
             
             todos[selectedDate].push({
                 id: result.data._id,
-                text: result.data.title,
+                text: result.data.task,
                 completed: result.data.completed,
                 createdAt: result.data.createdAt
             });
@@ -1046,9 +1181,8 @@ async function submitListAdd() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    title: line,
-                    dueDate: selectedDate,
-                    userId: currentUser.id,
+                    date: selectedDate,
+                    task: line,
                     completed: false
                 })
             })
@@ -1066,7 +1200,7 @@ async function submitListAdd() {
             if (result.success) {
                 todos[selectedDate].push({
                     id: result.data._id,
-                    text: result.data.title,
+                    text: result.data.task,
                     completed: result.data.completed,
                     createdAt: result.data.createdAt
                 });
@@ -1132,17 +1266,15 @@ async function updateTodoText(index, newText) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                title: text,
-                completed: todo.completed,
-                dueDate: selectedDate,
-                userId: currentUser.id
+                task: text,
+                completed: todo.completed
             })
         });
         
         const result = await response.json();
         
         if (result.success) {
-            todos[selectedDate][index].text = result.data.title;
+            todos[selectedDate][index].text = result.data.task;
             renderCalendar();
         } else {
             alert('할일 수정에 실패했습니다.');
@@ -1184,10 +1316,9 @@ async function deleteTodo(index) {
     }
 }
 
-// 할일 저장 (백엔드 API 사용으로 더 이상 필요 없음, 호환성 유지)
+// 할일 저장 (백엔드 API 사용으로 더 이상 필요 없음)
 function saveTodos() {
-    // 시간기록과 노트만 로컬 저장
-    saveUserData();
+    // 백엔드 API로 자동 저장됨
 }
 
 // 미리보기 표시
